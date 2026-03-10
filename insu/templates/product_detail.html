@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}상품 상세{% endblock %}
+{% block content %}
+<h1>{{ product.product_name }}</h1>
+<div class="card">
+    <p>브랜드: {{ product.brand }}</p>
+    <p>카테고리: {{ product.category }}</p>
+    <p>가격: {{ product.price }}원</p>
+    <p>사이즈 옵션: {{ product.size_options }}</p>
+    <a href="{{ url_for('review_create', product_id=product.product_id) }}">리뷰 작성하기</a>
+</div>
+
+{% if recommendation %}
+<div class="card">
+    <h2>나에게 맞는 추천</h2>
+    <p>{{ recommendation.message }}</p>
+
+    {% if recommendation.recommended_size %}
+    <div class="grid">
+        <div>
+            <h3>추천 결과</h3>
+            <p><strong>내 기준:</strong> {{ recommendation.user_basis.height }}cm / {{ recommendation.user_basis.weight }}kg / {{ recommendation.user_basis.preferred_fit }}</p>
+            <p><strong>추천 사이즈:</strong> {{ recommendation.recommended_size }}</p>
+            <p><strong>유사 사용자 수:</strong> {{ recommendation.similar_user_count }}명</p>
+            <p><strong>평균 만족도:</strong> {{ recommendation.average_rating }} / 5</p>
+            <p><strong>요약:</strong> {{ recommendation.summary }}</p>
+        </div>
+        <div>
+            <h3>사이즈/핏 통계</h3>
+            <p><strong>사이즈 분포</strong></p>
+            <ul>
+                {% for size, count in recommendation.size_distribution.items() %}
+                <li>{{ size }} : {{ count }}명</li>
+                {% endfor %}
+            </ul>
+            <p><strong>사이즈 체감</strong></p>
+            <ul>
+                {% for feel, count in recommendation.size_feel_distribution.items() %}
+                <li>{{ feel }} : {{ count }}명</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <h3>리뷰 키워드</h3>
+    {% for keyword, count in recommendation.keyword_distribution.items() %}
+        <span class="badge">{{ keyword }} {{ count }}</span>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>리뷰 목록</h2>
+    {% for review in reviews %}
+    <div style="border-top:1px solid #eee; padding:12px 0;">
+        <p><strong>{{ review.username }}</strong> ({{ review.height }}cm / {{ review.weight }}kg / {{ review.preferred_fit }})</p>
+        <p>구매 사이즈: {{ review.purchased_size }} | 사이즈 체감: {{ review.size_feel }} | 핏 체감: {{ review.fit_feel }} | 만족도: {{ review.rating }}</p>
+        <p>{{ review.review_text }}</p>
+    </div>
+    {% else %}
+    <p>아직 리뷰가 없습니다.</p>
+    {% endfor %}
+</div>
+{% endblock %}

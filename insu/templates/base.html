@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fit Recommend Shop{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 24px; line-height: 1.6; }
+        nav a { margin-right: 12px; }
+        .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .muted { color: #666; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .badge { display:inline-block; padding:4px 10px; border-radius:999px; background:#f2f2f2; margin:4px 6px 0 0; }
+        .flash { background:#eef6ff; padding:10px 14px; border-radius:10px; margin:12px 0; }
+        input, select, textarea, button { padding: 10px; margin-top: 6px; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
+        button { cursor: pointer; }
+        ul { padding-left: 18px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('home') }}">홈</a>
+        <a href="{{ url_for('profile') }}">내 체형 정보</a>
+        <a href="{{ url_for('init_demo') }}">데모 데이터 넣기</a>
+        <a href="{{ url_for('demo_login', user_id=1) }}">데모 로그인(user 1)</a>
+        <a href="{{ url_for('logout') }}">로그아웃</a>
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

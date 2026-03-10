@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}리뷰 작성{% endblock %}
+{% block content %}
+<h1>리뷰 작성</h1>
+<div class="card">
+    <h3>{{ product.product_name }}</h3>
+    <form method="post">
+        <label>구매한 사이즈</label>
+        <select name="purchased_size">
+            {% for s in product.size_options.split(',') %}
+            <option value="{{ s.strip() }}">{{ s.strip() }}</option>
+            {% endfor %}
+        </select>
+
+        <label>사이즈 체감</label>
+        <select name="size_feel">
+            <option value="작음">작음</option>
+            <option value="정사이즈">정사이즈</option>
+            <option value="큼">큼</option>
+        </select>
+
+        <label>핏 체감</label>
+        <select name="fit_feel">
+            <option value="슬림핏">슬림핏</option>
+            <option value="정핏">정핏</option>
+            <option value="세미오버핏">세미오버핏</option>
+            <option value="오버핏">오버핏</option>
+        </select>
+
+        <label>만족도</label>
+        <select name="rating">
+            <option value="5">5</option>
+            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+        </select>
+
+        <label>리뷰 내용</label>
+        <textarea name="review_text" rows="6" placeholder="예: 정사이즈 느낌이고 어깨가 편해요. 세미오버핏으로 만족합니다."></textarea>
+
+        <button type="submit">등록</button>
+    </form>
+</div>
+{% endblock %}

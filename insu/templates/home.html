@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}상품 목록{% endblock %}
+{% block content %}
+<h1>상품 목록</h1>
+
+{% for product in products %}
+<div class="card">
+    <h3>{{ product.product_name }}</h3>
+    <p>{{ product.brand }} | {{ product.category }} | {{ product.price }}원</p>
+    <p>사이즈 옵션: {{ product.size_options }}</p>
+    <a href="{{ url_for('product_detail', product_id=product.product_id) }}">상품 상세 보기</a>
+</div>
+{% else %}
+<p>등록된 상품이 없습니다.</p>
+{% endfor %}
+{% endblock %}
