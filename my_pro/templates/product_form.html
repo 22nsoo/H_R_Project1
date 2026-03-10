@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if mode == 'add' %}상품 등록{% else %}상품 수정{% endif %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-title">판매자 메뉴</div>
+            <ul class="menu">
+                <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
+                <li class="active"><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
+                <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
+                <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
+            </ul>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <h1>{% if mode == 'add' %}상품 등록{% else %}상품 수정{% endif %}</h1>
+            </header>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-box">
+                        {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-card">
+                <form method="post">
+                    <div class="form-row">
+                        <label for="product_name">상품명</label>
+                        <input
+                            type="text"
+                            id="product_name"
+                            name="product_name"
+                            value="{{ product['product_name'] if product else '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="category">카테고리</label>
+                        <input
+                            type="text"
+                            id="category"
+                            name="category"
+                            value="{{ product['category'] if product else '' }}"
+                            placeholder="예: 팬츠, 쇼츠"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="price">가격</label>
+                        <input
+                            type="number"
+                            id="price"
+                            name="price"
+                            min="0"
+                            value="{{ product['price'] if product else 0 }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="stock">재고</label>
+                        <input
+                            type="number"
+                            id="stock"
+                            name="stock"
+                            min="0"
+                            value="{{ product['stock'] if product else 0 }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="status">상태</label>
+                        <select id="status" name="status">
+                            <option value="판매중" {% if product and product["status"] == "판매중" %}selected{% endif %}>판매중</option>
+                            <option value="품절" {% if product and product["status"] == "품절" %}selected{% endif %}>품절</option>
+                            <option value="숨김" {% if product and product["status"] == "숨김" %}selected{% endif %}>숨김</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="image_url">이미지 URL</label>
+                        <input
+                            type="text"
+                            id="image_url"
+                            name="image_url"
+                            value="{{ product['image_url'] if product else '' }}"
+                            placeholder="https://..."
+                        >
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit">{% if mode == 'add' %}등록하기{% else %}수정하기{% endif %}</button>
+                        <a class="action-btn secondary" href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">목록으로</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
