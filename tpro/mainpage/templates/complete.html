@@ -3,64 +3,106 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>주문 완료</title>
+    <title>주문 완료 - H&R</title>
     <style>
         body {
             font-family: 'Pretendard', sans-serif;
-            background: #000;
-            /* 배경 검정 */
-            color: #fff;
+            background: #fff;
+            color: #000;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
         .complete-box {
             text-align: center;
+            margin-top: 15vh;
+            flex: 1;
         }
 
         .icon {
-            font-size: 50px;
+            font-size: 60px;
             margin-bottom: 20px;
+            color: #800020;
         }
 
         h2 {
             font-size: 32px;
+            font-weight: 900;
             margin-bottom: 10px;
+            letter-spacing: -1px;
         }
 
         p {
-            color: #888;
+            color: #666;
             margin-bottom: 40px;
         }
 
+        /* [포인트] 홈 버튼 딥 레드 */
         .home-btn {
             display: inline-block;
-            padding: 15px 40px;
-            background: #fff;
-            color: #000;
+            padding: 18px 50px;
+            background: #800020;
+            color: #fff;
             text-decoration: none;
             font-weight: bold;
-            border-radius: 30px;
-            /* 둥근 버튼 */
+            border-radius: 4px;
             transition: 0.3s;
+            text-transform: uppercase;
         }
 
         .home-btn:hover {
-            transform: scale(1.05);
+            background: #600018;
+        }
+
+        /* 푸터 스타일 */
+        .site-footer {
+            width: 100%;
+            background: #fff;
+            color: #000;
+            padding: 60px 0;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 28px;
+            letter-spacing: -1px;
+        }
+
+        .amp {
+            font-style: italic;
+            font-weight: 300;
+            color: #800020;
+            margin: 0 3px;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
         }
     </style>
 </head>
 
 <body>
     <div class="complete-box">
-        <div class="icon">🚀</div>
+        <div class="icon">✓</div>
         <h2>ORDER COMPLETE</h2>
-        <p>고객님의 주문이 성공적으로 접수되었습니다.</p>
-        <a href="/main" class="home-btn">쇼핑 계속하기 (홈으로)</a>
+        <p>주문이 성공적으로 완료되었습니다.<br>맛있는 음식을 곧 준비해 드릴게요!</p>
+        <a href="/main" class="home-btn">메인으로 돌아가기</a>
     </div>
+
+    <footer class="site-footer">
+        <div class="footer-logo"><span class="logo-text">H<span class="amp">&</span>R</span></div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>Park Yoo-sung</strong>. All Rights Reserved.</p>
+            <p>Computer Science & AI IT Bootcamp Project</p>
+        </div>
+    </footer>
 </body>
 
 </html>

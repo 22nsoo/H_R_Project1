@@ -1,113 +1,107 @@
-<!DOCTYPE html>
-<html lang="ko">
-
 <head>
     <meta charset="UTF-8">
-    <title>김밥천국 GRID</title>
+    <title>H&R SHOP</title>
     <style>
-        /* 기존 스타일 동일 */
+        /* 1. 기본 설정 */
         body {
             margin: 0;
-            font-family: 'Pretendard', -apple-system, sans-serif;
-            color: #333;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            color: #000;
+            background-color: #fff;
         }
 
-        header {
+        /* [수정] 상단 바 배경색 변경 */
+        .top-bar {
+            background-color: #800020;
+            /* 딥 레드 */
+            color: #fff;
+            font-size: 11px;
+            padding: 10px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 5%;
+        }
+
+        .top-bar a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* 2. 헤더 스타일 */
+        header {
             background: #fff;
             border-bottom: 1px solid #eee;
+            padding: 25px 5%;
         }
 
-        .logo {
-            font-size: 24px;
+        .logo-box {
+            margin-bottom: 20px;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: #800020;
+            /* 로고 색상 변경 */
+            font-size: 26px;
             font-weight: 900;
-            letter-spacing: -1px;
+            letter-spacing: -1.5px;
         }
 
-        .search-container {
+        /* 3. 검색창 및 버튼 */
+        .search-form {
+            margin: 0;
+            position: relative;
+            width: 100%;
+        }
+
+        .search-wrapper {
+            display: flex;
+            border: 2px solid #800020;
+            /* 보더 색상 변경 */
+            background: #fff;
+            width: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .input-container {
+            position: relative;
+            flex: 1;
             display: flex;
             align-items: center;
-            background: #fff;
-            border: 2px solid #000;
-            border-radius: 4px;
-            width: 500px;
-            height: 48px;
-            position: relative;
         }
 
         .search-input {
-            flex: 1;
+            width: 100%;
+            height: 52px;
+            padding: 0 60px 0 15px;
             border: none;
-            padding: 0 15px;
-            font-size: 15px;
+            font-size: 16px;
             outline: none;
-            height: 100%;
+            box-sizing: border-box;
             background: transparent;
         }
 
-        .image-search-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 100%;
-            cursor: pointer;
-            color: #888;
-            transition: 0.2s;
-        }
-
-        .image-search-label:hover {
-            color: #000;
-            background: #f9f9f9;
-        }
-
+        /* [수정] 검색 버튼 색상 */
         .search-btn {
-            background: #000;
-            color: #fff;
+            width: 120px;
+            height: 52px;
+            background: #800020 !important;
+            color: #fff !important;
             border: none;
-            height: 100%;
-            padding: 0 25px;
             font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 15px;
+            transition: background 0.3s ease;
         }
 
-        #image-preview-container {
-            display: none;
-            position: absolute;
-            top: 55px;
-            right: 0;
-            background: #fff;
-            padding: 15px;
-            border: 1px solid #ddd;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            border-radius: 8px;
-            width: 150px;
-            text-align: center;
+        .search-btn:hover {
+            background: #600018 !important;
         }
 
-        #image-preview {
-            width: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            border: 1px solid #eee;
-        }
-
-        .preview-btns {
-            display: flex;
-            gap: 5px;
-        }
-
+        /* 4. 네비게이션 */
         nav {
-            display: flex;
-            gap: 30px;
-            padding: 15px 5%;
+            padding: 0 5%;
             background: #fff;
             border-bottom: 1px solid #eee;
             position: sticky;
@@ -115,18 +109,31 @@
             z-index: 100;
         }
 
-        nav a {
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .nav-inner a {
             text-decoration: none;
-            color: #333;
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .active {
-            border-bottom: 2px solid #000;
+            color: #800020;
             padding-bottom: 5px;
+
         }
 
+        .nav-inner a.active {
+            border-bottom: 2px solid #800020;
+            color: #800020;
+        }
+
+        /* 5. 상품 그리드 */
         .container {
             padding: 40px 5%;
         }
@@ -139,7 +146,7 @@
 
         .card {
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
         }
 
         .card:hover {
@@ -149,114 +156,142 @@
         .img-box {
             width: 100%;
             aspect-ratio: 3/4;
-            background: #f3f3f3;
+            background: #f9f9f9;
+            margin-bottom: 15px;
             border-radius: 4px;
             overflow: hidden;
+            border: 1px solid #eee;
         }
 
         .brand {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            margin-bottom: 4px;
-            color: #666;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
         .name {
             font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
             line-height: 1.4;
             height: 40px;
-            margin-bottom: 8px;
             overflow: hidden;
         }
 
         .price {
             font-size: 16px;
             font-weight: 700;
+            color: #800020;
+        }
+
+        /* 6. 푸터 */
+        .site-footer {
+            background-color: #fff;
+            color: #000;
+            padding: 80px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -1.5px;
+            color: #800020;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .footer-links {
+            margin-top: 30px;
+        }
+
+        .footer-links a {
+            color: #800020;
+            /* 푸터 링크도 포인트 컬러 적용 */
+            text-decoration: none;
+            font-size: 12px;
+            margin: 0 15px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
     </style>
 </head>
 
 <body>
-    <div
-        style="background-color: #000; color: #fff; font-size: 11px; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; gap: 15px; font-weight: bold; letter-spacing: 0.5px;">
-            <span style="cursor:pointer" onclick="location.href='/main'">KIMBAB</span>
-            <span style="color:#666; cursor:pointer">BEST</span>
-            <span style="color:#666; cursor:pointer">SALE</span>
+    <div class="top-bar">
+        <div style="display: flex; gap: 15px; font-weight: bold;">
+            <span style="cursor:pointer" onclick="location.href='/main'">H&R</span>
+            <span style="color:#666;">BEST</span>
+            <span style="color:#666;">SALE</span>
         </div>
-        <div style="display: flex; gap: 20px; align-items: center; font-weight: 500;">
-            <a href="{{ url_for('cart_page') }}" style="color: #fff; text-decoration: none; position: relative;">
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="{{ url_for('cart_page') }}" style="position: relative;">
                 장바구니
                 {% if session.get('cart') %}
                 <span
-                    style="background: #ff4d4d; color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; margin-left: 3px;">
+                    style="background: #800020; color: white; font-size: 9px; padding: 1px 5px; border-radius: 10px; margin-left: 3px;">
                     {{ session.get('cart').values() | map(attribute='qty') | sum }}
                 </span>
                 {% endif %}
             </a>
-            <a href="#" style="color: #fff; text-decoration: none;">마이페이지</a>
             {% if session.user_name %}
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="color: #444;">|</span>
-                <span style="color: #fff;">{{ session.user_name }}님</span>
-                <a href="{{ url_for('logout') }}"
-                    style="color: #aaa; text-decoration: none; font-size: 10px; border: 1px solid #444; padding: 2px 6px; border-radius: 2px;">로그아웃</a>
-            </div>
+            <span>{{ session.user_name }}님</span>
+            <a href="{{ url_for('logout') }}"
+                style="color: #aaa; font-size: 10px; border: 1px solid #444; padding: 2px 6px;">로그아웃</a>
             {% else %}
-            <a href="{{ url_for('login') }}"
-                style="color: #fff; text-decoration: none; border: 1px solid #fff; padding: 3px 10px; border-radius: 2px;">로그인</a>
+            <a href="{{ url_for('login') }}" style="border: 1px solid #fff; padding: 3px 10px;">로그인</a>
             {% endif %}
         </div>
     </div>
 
-    <header style="background: #fff; border-bottom: 1px solid #ddd; padding: 25px 5%;">
-        <div style="width: 100%; display: flex; flex-direction: column; gap: 20px;">
-            <div style="text-align: left;"><a href="/main"
-                    style="text-decoration: none; color: #000; font-size: 20px; font-weight: 900; letter-spacing: -1px;">김밥천국</a>
-            </div>
-            <form id="combined-search-form" action="/main" method="GET" enctype="multipart/form-data"
-                style="margin: 0; position: relative; width: 100%;">
-                <div style="display: flex; border: 2px solid #000; background: #fff; width: 100%;">
-                    <div style="position: relative; flex: 1; display: flex; align-items: center;">
-                        <input type="text" name="search" class="search-input" placeholder="브랜드 또는 메뉴를 입력하세요"
-                            value="{{ request.args.get('search', '') }}"
-                            style="width: 100%; height: 52px; padding: 0 60px 0 15px; border: none; font-size: 16px; outline: none; box-sizing: border-box;">
-                        <label for="image-upload"
-                            style="position: absolute; right: 15px; cursor: pointer; color: #888;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
-                                </path>
-                                <circle cx="12" cy="13" r="4"></circle>
-                            </svg>
-                        </label>
-                        <input type="file" id="image-upload" name="search_img" style="display:none;"
-                            onchange="previewImage(this)">
-                    </div>
-                    <button type="submit"
-                        style="width: 120px; height: 52px; background: #000; color: #fff; border: none; font-weight: bold; font-size: 16px; cursor: pointer;">검색</button>
+    <header>
+        <div class="logo-box">
+            <a href="/main" class="logo-link">H&R</a>
+        </div>
+        <form id="combined-search-form" action="/main" method="GET" enctype="multipart/form-data" class="search-form">
+            <div class="search-wrapper">
+                <div class="input-container">
+                    <input type="text" name="search" class="search-input" placeholder="브랜드 또는 메뉴를 입력하세요"
+                        value="{{ request.args.get('search', '') }}">
+                    <label for="image-upload" style="position: absolute; right: 15px; cursor: pointer; color: #888;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                            </path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </label>
+                    <input type="file" id="image-upload" name="search_img" style="display:none;"
+                        onchange="previewImage(this)">
                 </div>
-            </form>
+                <button type="submit" class="search-btn">검색</button>
+            </div>
+
             <div id="image-preview-container"
-                style="display:none; position: absolute; top: 60px; right: 0; background: white; border: 1px solid #000; padding: 15px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <p style="font-size: 12px; margin-bottom: 10px; font-weight: bold;">선택한 이미지 미리보기</p>
+                style="display:none; position: absolute; top: 60px; right: 0; background: white; border: 1px solid #000; padding: 15px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 200px;">
+                <p style="font-size: 12px; margin-bottom: 10px; font-weight: bold;">이미지 검색 미리보기</p>
                 <img id="image-preview" src="#"
-                    style="max-width: 200px; max-height: 200px; display: block; margin-bottom: 10px; border: 1px solid #eee;">
+                    style="width: 100%; display: block; margin-bottom: 10px; border: 1px solid #eee;">
                 <div style="display: flex; gap: 5px;">
                     <button type="button" onclick="submitImageSearch()"
-                        style="flex: 1; height: 35px; background: #000; color: #fff; border: none; cursor: pointer; font-size: 12px;">이
-                        이미지로 검색</button>
+                        style="flex: 1; height: 35px; background: #800020; color: #fff; border: none; cursor: pointer; font-size: 11px;">검색</button>
                     <button type="button" onclick="cancelImage()"
-                        style="flex: 1; height: 35px; background: #eee; color: #333; border: 1px solid #ddd; cursor: pointer; font-size: 12px;">취소</button>
+                        style="flex: 1; height: 35px; background: #eee; border: 1px solid #ddd; cursor: pointer; font-size: 11px;">취소</button>
                 </div>
             </div>
-        </div>
+        </form>
     </header>
 
-    <nav style="padding: 0 5%; background: #fff; border-bottom: 1px solid #eee;">
-        <div
-            style="max-width: 1200px; margin: 0 auto; display: flex; gap: 30px; height: 50px; align-items: center; font-size: 14px; font-weight: bold;">
+    <nav>
+        <div class="nav-inner">
             <a href="/main?cate=ALL" class="{{ 'active' if current_cate == 'ALL' }}">전체</a>
             <a href="/main?cate=TOP" class="{{ 'active' if current_cate == 'TOP' }}">상의</a>
             <a href="/main?cate=PANTS" class="{{ 'active' if current_cate == 'PANTS' }}">하의</a>
@@ -281,6 +316,19 @@
         </div>
         {% if not items %}<p style="text-align:center; padding:50px; color:#999;">검색 결과가 없습니다. 😭</p>{% endif %}
     </div>
+
+    <footer class="site-footer">
+        <div class="footer-logo">
+            <span class="logo-text">H<span class="amp">&</span>R</span>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+            <p>Hyundai ROTEM & AI IT Bootcamp Project</p>
+        </div>
+        <div class="footer-links">
+            <a href="/main">Home</a><a href="/cart">Cart</a><a href="https://github.com/parkyoosung">Github</a>
+        </div>
+    </footer>
 
     <script>
         function previewImage(input) {
