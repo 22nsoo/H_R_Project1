@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f9f9f9;
+        }
+
+        .signup-box {
+            background: white;
+            padding: 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body
+    style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #fff; font-family: 'Pretendard', sans-serif;">
+
+    <div style="margin-bottom: 40px; text-align: center;">
+        <a href="/main"
+            style="text-decoration: none; color: #000; font-size: 32px; font-weight: 900; letter-spacing: -1px;">김밥천국</a>
+    </div>
+
+    <div style="width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px;">
+        <h2 style="text-align: center; margin: 0 0 20px 0; font-size: 24px;">회원가입</h2>
+
+        <form action="/signup" method="POST" style="display: flex; flex-direction: column; gap: 10px; margin: 0;">
+            <input type="text" name="user_id" placeholder="아이디" required
+                style="width: 100%; height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; font-size: 15px;">
+
+            <input type="password" name="user_pw" placeholder="비밀번호" required
+                style="width: 100%; height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; font-size: 15px;">
+
+            <input type="text" name="user_name" placeholder="이름" required
+                style="width: 100%; height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; font-size: 15px;">
+
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; background: #f9f9f9; box-sizing: border-box;">
+                <span style="font-size: 14px; color: #666;">성별</span>
+                <div style="display: flex; gap: 20px;">
+                    <label style="font-size: 15px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="gender" value="남" checked style="accent-color: #000;"> 남
+                    </label>
+                    <label style="font-size: 15px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="gender" value="여" style="accent-color: #000;"> 여
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <input type="number" name="height" placeholder="키(cm)" required
+                    style="width: calc(50% - 5px); height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; font-size: 15px;">
+                <input type="number" name="weight" placeholder="몸무게(kg)" required
+                    style="width: calc(50% - 5px); height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; font-size: 15px;">
+            </div>
+
+            <div
+                style="display: flex; align-items: center; height: 52px; padding: 0 15px; border: 1px solid #f2f2f2; border-radius: 8px; background: #f9f9f9; box-sizing: border-box;">
+                <span style="font-size: 14px; color: #666; margin-right: 15px; white-space: nowrap;">평소 사이즈</span>
+                <select name="size"
+                    style="flex: 1; border: none; background: transparent; font-size: 15px; outline: none; cursor: pointer;">
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="XXL">XXL</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                style="width: 100%; height: 52px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px;">
+                가입하기
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center; font-size: 13px; color: #888;">
+            이미 회원이신가요? <a href="/login"
+                style="text-decoration: none; color: #000; font-weight: bold; margin-left: 5px;">로그인</a>
+        </div>
+    </div>
+</body>
+
+</html>
