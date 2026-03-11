@@ -79,23 +79,6 @@ def seller_dashboard(seller_id):
     """, (seller_id,))
     cs_count = int(cursor.fetchone()["cs_count"] or 0)
     
-    # 총 주문 수 
-    # cursor.execute("""
-    #     SELECT COUNT(*) AS total_orders
-    #     FROM orders
-    #     WHERE seller_id = %s
-    # """, (seller_id,))
-    # total_orders = int(cursor.fetchone()["total_orders"] or 0)
-    
-    # 판매 상품 
-    # cursor.execute("""
-    #     SELECT COUNT(*) AS active_products
-    #     FROM products
-    #     WHERE seller_id = %s
-    #     AND status = '판매중'
-    # """, (seller_id,))
-    # active_products = int(cursor.fetchone()["active_products"] or 0)
-
     cursor.execute("""
         SELECT
             p.product_name,
@@ -145,16 +128,17 @@ def seller_dashboard(seller_id):
     for order in recent_orders:
         order["total_amount"] = int(order["total_amount"] or 0)
 
+    # 일매출 그래프
     cursor.execute("""
-        SELECT
-            DATE(order_date) AS sales_date,
-            COALESCE(SUM(total_amount), 0) AS daily_sales
-        FROM orders
-        WHERE seller_id = %s
-        AND YEAR(order_date) = YEAR(CURDATE())
-        AND MONTH(order_date) = MONTH(CURDATE())
-        GROUP BY DATE(order_date)
-        ORDER BY sales_date ASC
+    SELECT
+        DATE(order_date) AS sales_date,
+        COALESCE(SUM(total_amount), 0) AS daily_sales
+    FROM orders
+    WHERE seller_id = %s
+    AND YEAR(order_date) = YEAR(CURDATE())
+    AND MONTH(order_date) = MONTH(CURDATE())
+    GROUP BY DATE(order_date)
+    ORDER BY sales_date ASC
     """, (seller_id,))
 
     sales_map = {}
@@ -172,6 +156,24 @@ def seller_dashboard(seller_id):
         labels.append(day.strftime("%m/%d"))
         values.append(int(sales_map.get(str(day), 0)))
 
+    # 월매출 그래프
+    cursor.execute("""
+    SELECT
+        DATE_FORMAT(order_date,'%%Y-%%m') AS m,
+        COALESCE(SUM(total_amount),0) AS sales
+    FROM orders
+    WHERE seller_id=%s
+    GROUP BY DATE_FORMAT(order_date,'%%Y-%%m')
+    ORDER BY m ASC
+    """,(seller_id,))
+
+    monthly_labels = []
+    monthly_values = []
+
+    for row in cursor.fetchall():
+        monthly_labels.append(row["m"])
+        monthly_values.append(int(row["sales"] or 0))
+
     cursor.close()
     conn.close()
 
@@ -182,13 +184,14 @@ def seller_dashboard(seller_id):
         month_sales=month_sales,
         pending_orders=pending_orders,
         cs_count=cs_count,
-        # total_orders=total_orders,
-        # active_products=active_products,
         top_products=top_products,
         low_stock_products=low_stock_products,
         recent_orders=recent_orders,
-        chart_labels=json.dumps(labels, ensure_ascii=False),
-        chart_values=json.dumps(values, ensure_ascii=False),
+        chart_labels=json.dumps(labels),
+        chart_values=json.dumps(values),
+
+        monthly_labels=json.dumps(monthly_labels),
+        monthly_values=json.dumps(monthly_values)
     )
 
 
@@ -480,6 +483,75 @@ def seller_orders(seller_id):
         orders=orders
     )
 
+@app.route("/seller/sales/<int:seller_id>")
+def seller_sales(seller_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # 판매자 정보
+    cursor.execute(
+        "SELECT seller_id, seller_name FROM sellers WHERE seller_id=%s",
+        (seller_id,)
+    )
+    seller = cursor.fetchone()
+
+    if not seller:
+        cursor.close()
+        conn.close()
+        return "판매자를 찾을 수 없습니다."
+
+    # -------------------------
+    # 일 매출
+    # -------------------------
+    cursor.execute("""
+        SELECT DATE(order_date) AS d,
+            SUM(total_amount) AS sales
+        FROM orders
+        WHERE seller_id=%s
+        GROUP BY DATE(order_date)
+        ORDER BY d DESC
+        LIMIT 30
+    """, (seller_id,))
+    daily_sales = cursor.fetchall()
+
+    # -------------------------
+    # 월 매출
+    # -------------------------
+    cursor.execute("""
+        SELECT DATE_FORMAT(order_date,'%%Y-%%m') AS m,
+            SUM(total_amount) AS sales
+        FROM orders
+        WHERE seller_id=%s
+        GROUP BY DATE_FORMAT(order_date,'%%Y-%%m')
+        ORDER BY m DESC
+    """, (seller_id,))
+    monthly_sales = cursor.fetchall()
+
+    # -------------------------
+    # 연 매출
+    # -------------------------
+    cursor.execute("""
+        SELECT YEAR(order_date) AS y,
+            SUM(total_amount) AS sales
+        FROM orders
+        WHERE seller_id=%s
+        GROUP BY YEAR(order_date)
+        ORDER BY y DESC
+    """, (seller_id,))
+    yearly_sales = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "seller_sales.html",
+        seller=seller,
+        daily_sales=daily_sales,
+        monthly_sales=monthly_sales,
+        yearly_sales=yearly_sales
+    )
+    
 
 # 판매자 CS (문의 + 교환/환불 관리)
 @app.route("/seller/cs/<int:seller_id>")
@@ -493,9 +565,15 @@ def seller_cs(seller_id):
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # =====================
+    # 판매자 정보
+    cursor.execute("""
+        SELECT seller_id, seller_name
+        FROM sellers
+        WHERE seller_id=%s
+    """, (seller_id,))
+    seller = cursor.fetchone()
+
     # 상품 문의 개수
-    # =====================
     cursor.execute("""
         SELECT COUNT(*) as cnt
         FROM customer_service
@@ -576,6 +654,7 @@ def seller_cs(seller_id):
 
     return render_template(
         "seller_cs.html",
+        seller=seller,
         questions=questions,
         returns=returns,
         seller_id=seller_id,

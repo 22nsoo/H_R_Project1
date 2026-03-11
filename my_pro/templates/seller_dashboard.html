@@ -13,6 +13,7 @@
             <div class="sidebar-title">판매자 메뉴</div>
             <ul class="menu">
                 <li class="active"><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
+                <li><a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">매출 관리</a></li>
                 <li><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
                 <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
                 <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
@@ -43,14 +44,18 @@
             {% endwith %}
 
             <section class="card-grid">
+                <a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">
                 <div class="stat-card">
                     <div class="stat-title">일매출</div>
                     <div class="stat-value">{{ "{:,}".format(today_sales) }}원</div>
                 </div>
+                </a>
+                <a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">
                 <div class="stat-card">
                     <div class="stat-title">월매출</div>
                     <div class="stat-value">{{ "{:,}".format(month_sales) }}원</div>
                 </div>
+                </a>
                 <a href="{{ url_for('seller_orders', seller_id=seller['seller_id'], type='pending') }}" class="stat-card-link">
                 <div class="stat-card">
                     <div class="stat-title">배송 미처리건</div>
@@ -67,7 +72,12 @@
 
             <div class="dashboard-grid dashboard-grid-top">
                 <div class="chart-scroll">
-                    <h2>일매출 현황</h2>
+                    <h2>매출 현황</h2>
+                    <div class="chart-tabs">
+                    <button onclick="showDaily()">일매출</button>
+                    <button onclick="showMonthly()">월매출</button>
+                    </div>
+
                     <canvas id="salesChart"></canvas>
                 </div>
 
@@ -178,52 +188,70 @@
         </main>
     </div>
 
-<script>
-const labels = {{ chart_labels | safe }};
-const values = {{ chart_values | safe }};
+    <script>
+    const dailyLabels = {{ chart_labels | safe }};
+    const dailyValues = {{ chart_values | safe }};
 
-const ctx = document.getElementById("salesChart").getContext("2d");
+    const monthlyLabels = {{ monthly_labels | safe }};
+    const monthlyValues = {{ monthly_values | safe }};
 
-new Chart(ctx, {
-    type: "line",
-    data: {
-        labels: labels,
-        datasets: [{
-            data: values,
-            borderColor: "#2f6bff",
-            backgroundColor: "rgba(47, 107, 255, 0.1)",
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        interaction: {
-            mode: "index",
-            intersect: false
+    const ctx = document.getElementById("salesChart").getContext("2d");
+
+    // 기본 그래프 = 일매출
+    let salesChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: dailyLabels,
+            datasets: [{
+                data: dailyValues,
+                borderColor: "#2f6bff",
+                backgroundColor: "rgba(47, 107, 255, 0.1)",
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
         },
-        plugins: {
-            legend: {
-                display: false
+        options: {
+            responsive: true,
+            interaction: {
+                mode: "index",
+                intersect: false
             },
-            tooltip: {
-                enabled: true,
-                callbacks: {
-                    label: function(context) {
-                        return context.raw.toLocaleString() + "원";
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.raw.toLocaleString() + "원";
+                        }
                     }
                 }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
+    });
+
+    // 일매출 버튼
+    function showDaily(){
+        salesChart.data.labels = dailyLabels;
+        salesChart.data.datasets[0].data = dailyValues;
+        salesChart.update();
     }
-});
-</script>
+
+    // 월매출 버튼
+    function showMonthly(){
+        salesChart.data.labels = monthlyLabels;
+        salesChart.data.datasets[0].data = monthlyValues;
+        salesChart.update();
+    }
+    </script>
 </body>
 </html>
