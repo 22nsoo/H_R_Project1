@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, Response
 from db import get_connection
 import json
 import pymysql
+import csv
 from datetime import date, timedelta
 
 app = Flask(__name__)
@@ -488,6 +489,20 @@ def seller_sales(seller_id):
 
     conn = get_connection()
     cursor = conn.cursor()
+    
+    # 연도 파라미터 받기
+    year = request.args.get("year", type=int)
+    if not year:
+        year = date.today().year
+
+    # 기간 파라미터 추가 
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    if not start_date:
+        start_date = date.today().replace(day=1)  # 이번달 1일
+    if not end_date:
+        end_date = date.today()
 
     # 판매자 정보
     cursor.execute(
@@ -506,13 +521,14 @@ def seller_sales(seller_id):
     # -------------------------
     cursor.execute("""
         SELECT DATE(order_date) AS d,
-            SUM(total_amount) AS sales
+        SUM(total_amount) AS sales
         FROM orders
         WHERE seller_id=%s
-        GROUP BY DATE(order_date)
+        AND DATE(order_date) BETWEEN %s AND %s
+        GROUP BY DATE(order_date) 
         ORDER BY d DESC
         LIMIT 30
-    """, (seller_id,))
+    """, (seller_id,start_date, end_date))
     daily_sales = cursor.fetchall()
 
     # -------------------------
@@ -520,12 +536,13 @@ def seller_sales(seller_id):
     # -------------------------
     cursor.execute("""
         SELECT DATE_FORMAT(order_date,'%%Y-%%m') AS m,
-            SUM(total_amount) AS sales
+        COALESCE(SUM(total_amount),0) AS sales
         FROM orders
         WHERE seller_id=%s
+        AND YEAR(order_date)=%s
         GROUP BY DATE_FORMAT(order_date,'%%Y-%%m')
         ORDER BY m DESC
-    """, (seller_id,))
+    """, (seller_id,year))
     monthly_sales = cursor.fetchall()
 
     # -------------------------
@@ -541,17 +558,101 @@ def seller_sales(seller_id):
     """, (seller_id,))
     yearly_sales = cursor.fetchall()
 
+    # -------------------------
+    # 연도 목록 가져오기
+    # -------------------------
+    cursor.execute("""
+    SELECT DISTINCT YEAR(order_date) AS y
+    FROM orders
+    WHERE seller_id=%s
+    ORDER BY y DESC
+    """,(seller_id,))
+
+    year_list = [row["y"] for row in cursor.fetchall()]
+
+    # ------------------------------------------
+    #  총 매출 / 총 주문 / 평균 주문금액 카드 추가
+    # ------------------------------------------
+    cursor.execute("""
+    SELECT
+        COALESCE(SUM(total_amount),0) AS total_sales,
+        COUNT(order_id) AS total_orders
+    FROM orders
+    WHERE seller_id=%s
+    """,(seller_id,))
+
+    summary = cursor.fetchone()
+
+    total_sales = int(summary["total_sales"] or 0)
+    total_orders = int(summary["total_orders"] or 0)
+
+    avg_order = int(total_sales / total_orders) if total_orders > 0 else 0
+
     cursor.close()
     conn.close()
 
     return render_template(
         "seller_sales.html",
         seller=seller,
+        year=year,
+        year_list=year_list,
+
+        start_date=start_date,
+        end_date=end_date,
+
+        total_sales=total_sales,
+        total_orders=total_orders,
+        avg_order=avg_order,
+
         daily_sales=daily_sales,
         monthly_sales=monthly_sales,
         yearly_sales=yearly_sales
     )
     
+
+# 다운로드 CSV 추가
+import csv
+from flask import Response
+
+@app.route("/seller/sales/export/<int:seller_id>")
+def export_sales_csv(seller_id):
+
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT DATE(order_date) AS date,
+            COUNT(order_id) AS order_count,
+            SUM(total_amount) AS sales
+        FROM orders
+        WHERE seller_id=%s
+        AND DATE(order_date) BETWEEN %s AND %s
+        GROUP BY DATE(order_date)
+        ORDER BY date DESC
+    """, (seller_id, start_date, end_date))
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    def generate():
+        yield '\ufeff'   # UTF-8 BOM (엑셀 한글 깨짐 방지)
+        yield "날짜,주문수,매출\n"
+        for r in rows:
+            yield f"{r['date']},{r['order_count']},{r['sales']}\n"
+
+    filename = f"sales_{start_date}_{end_date}.csv"
+
+    return Response(
+        generate(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename={filename}"}
+    )
+
 
 # 판매자 CS (문의 + 교환/환불 관리)
 @app.route("/seller/cs/<int:seller_id>")

@@ -10,6 +10,7 @@
 
 <div class="layout">
 
+<!-- 사이드바 -->
 <aside class="sidebar">
 <div class="sidebar-title">판매자 메뉴</div>
 
@@ -21,21 +22,64 @@
 <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
 <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
 </ul>
-
 </aside>
+
 
 <main class="main">
 
+<!-- 상단 -->
 <header class="topbar">
 <h1>매출 관리</h1>
-<div class="seller-info"><strong>{{ seller["seller_name"] }}</strong> 매출 관리</div>
+<div class="seller-info">
+<strong>{{ seller["seller_name"] }}</strong> 매출 관리
+</div>
 </header>
+
+
+<!-- 요약 카드 -->
+<section class="summary-cards">
+
+<div class="summary-card">
+<div class="summary-title">총 매출</div>
+<div class="summary-value">{{ "{:,}".format(total_sales) }}원</div>
+</div>
+
+<div class="summary-card">
+<div class="summary-title">총 주문</div>
+<div class="summary-value">{{ total_orders }}건</div>
+</div>
+
+<div class="summary-card">
+<div class="summary-title">평균 주문금액</div>
+<div class="summary-value">{{ "{:,}".format(avg_order) }}원</div>
+</div>
+
+</section>
+
+
+<!-- ===================== -->
+<!-- 일 매출 -->
+<!-- ===================== -->
 
 <div class="panel">
 
 <h2>일 매출</h2>
 
-<table>
+<form method="get">
+<input type="hidden" name="year" value="{{ year }}">
+
+<input type="date" name="start_date" value="{{ start_date }}">
+~
+<input type="date" name="end_date" value="{{ end_date }}">
+
+<button type="submit">조회</button>
+</form>
+
+
+<div class="table-scroll">
+
+<table class="sales-table">
+
 <thead>
 <tr>
 <th>날짜</th>
@@ -44,23 +88,70 @@
 </thead>
 
 <tbody>
+
 {% for d in daily_sales %}
 <tr>
 <td>{{ d.d }}</td>
 <td>{{ "{:,}".format(d.sales) }}원</td>
 </tr>
 {% endfor %}
+
 </tbody>
 
 </table>
 
 </div>
 
+
+<div class="table-footer">
+<a class="download-btn"
+href="{{ url_for('export_sales_csv',
+seller_id=seller['seller_id'],
+start_date=start_date,
+end_date=end_date) }}">
+CSV 다운로드
+</a>
+</div>
+
+</div>
+
+
+
+<!-- ===================== -->
+<!-- 월 매출 -->
+<!-- ===================== -->
+
 <div class="panel">
+
+<div class="panel-header">
 
 <h2>월 매출</h2>
 
-<table>
+<form method="get">
+<input type="hidden" name="start_date" value="{{ start_date }}">
+<input type="hidden" name="end_date" value="{{ end_date }}">
+
+<select name="year" onchange="this.form.submit()">
+
+{% for y in year_list %}
+
+<option value="{{ y }}" {% if y|string == year|string %}selected{% endif %}>
+{{ y }}년
+</option>
+
+{% endfor %}
+
+</select>
+
+</form>
+
+</div>
+
+
+<div class="table-scroll">
+
+<table class="sales-table">
+
 <thead>
 <tr>
 <th>월</th>
@@ -69,23 +160,36 @@
 </thead>
 
 <tbody>
+
 {% for m in monthly_sales %}
 <tr>
 <td>{{ m.m }}</td>
 <td>{{ "{:,}".format(m.sales) }}원</td>
 </tr>
 {% endfor %}
+
 </tbody>
 
 </table>
 
 </div>
 
+</div>
+
+
+
+<!-- ===================== -->
+<!-- 연 매출 -->
+<!-- ===================== -->
+
 <div class="panel">
 
 <h2>연 매출</h2>
 
-<table>
+<div class="table-scroll">
+
+<table class="sales-table">
+
 <thead>
 <tr>
 <th>연도</th>
@@ -94,17 +198,22 @@
 </thead>
 
 <tbody>
+
 {% for y in yearly_sales %}
 <tr>
 <td>{{ y.y }}</td>
 <td>{{ "{:,}".format(y.sales) }}원</td>
 </tr>
 {% endfor %}
+
 </tbody>
 
 </table>
 
 </div>
+
+</div>
+
 
 </main>
 </div>
