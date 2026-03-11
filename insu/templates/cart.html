@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장바구니 - H&R</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 42px 84px 90px;
+        }
+
+        .logo {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 30px;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 2px solid #800020;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            padding: 18px 14px;
+            border-bottom: 1px solid #ececec;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 15px;
+        }
+
+        .cart-table th {
+            background: #faf7f8;
+            color: #800020;
+            font-weight: 800;
+        }
+
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: left;
+        }
+
+        .product-img {
+            width: 90px;
+            height: 110px;
+            background: #f4f4f4;
+            border: 1px solid #ececec;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f4f4f4;
+        }
+
+        .product-info {
+            min-width: 0;
+        }
+
+        .brand {
+            font-size: 13px;
+            color: #777;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        .qty-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #d7bfc7;
+            color: #800020;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            background: #fff;
+        }
+
+        .delete-btn {
+            color: #800020;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .summary {
+            margin-top: 30px;
+            border: 1px solid #ead6dc;
+            background: #faf7f8;
+            padding: 24px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .summary-label {
+            font-size: 18px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .summary-price {
+            font-size: 30px;
+            font-weight: 900;
+            color: #800020;
+        }
+
+        .btn-row {
+            margin-top: 30px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            min-width: 180px;
+            height: 56px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #800020;
+            color: #fff;
+            border: 1px solid #800020;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #800020;
+            border: 1px solid #800020;
+        }
+
+        .empty-box {
+            border: 1px solid #ececec;
+            background: #fafafa;
+            padding: 70px 20px;
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+        }
+
+        @media (max-width: 1100px) {
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .wrap {
+                padding: 30px 24px 70px;
+            }
+
+            .logo {
+                font-size: 42px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .summary {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cart-table th:nth-child(3),
+            .cart-table td:nth-child(3) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/main">쇼핑 계속하기</a>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="logo">H&amp;R</div>
+        <div class="title">장바구니</div>
+
+        {% if items and items|length > 0 %}
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th style="width: 48%;">상품정보</th>
+                        <th style="width: 14%;">가격</th>
+                        <th style="width: 18%;">수량</th>
+                        <th style="width: 14%;">합계</th>
+                        <th style="width: 6%;">삭제</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-img">
+                                    {% if item.img %}
+                                        <img src="{{ item.img }}" alt="{{ item.name }}">
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <div class="brand">{{ item.brand }}</div>
+                                    <div class="name">{{ item.name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ "{:,}".format(item.price) }}원</td>
+                        <td>
+                            <div class="qty-box">
+                                <a href="/update_cart/{{ item.id }}/minus" class="qty-btn">-</a>
+                                <span>{{ item.qty }}</span>
+                                <a href="/update_cart/{{ item.id }}/plus" class="qty-btn">+</a>
+                            </div>
+                        </td>
+                        <td>{{ "{:,}".format(item.price * item.qty) }}원</td>
+                        <td>
+                            <a href="/update_cart/{{ item.id }}/delete" class="delete-btn">삭제</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="summary">
+                <div class="summary-label">총 결제 예정 금액</div>
+                <div class="summary-price">{{ "{:,}".format(total) }}원</div>
+            </div>
+
+            <div class="btn-row">
+                <a href="/main" class="btn btn-outline">계속 쇼핑하기</a>
+                <a href="/order" class="btn btn-primary">주문하기</a>
+            </div>
+        {% else %}
+            <div class="empty-box">장바구니가 비어 있습니다.</div>
+
+            <div class="btn-row">
+                <a href="/main" class="btn btn-primary">상품 보러가기</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

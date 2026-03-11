@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>주문/결제 - H&R</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 42px 84px 90px;
+        }
+
+        .logo {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            border: 1px solid #e8e8e8;
+            background: #fff;
+            padding: 28px;
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #800020;
+            margin-bottom: 18px;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+            border: 1px solid #d8c8ce;
+            outline: none;
+            background: #fff;
+            font-size: 15px;
+            padding: 0 16px;
+        }
+
+        .input,
+        .select {
+            height: 56px;
+            margin-bottom: 14px;
+        }
+
+        .textarea {
+            min-height: 120px;
+            padding: 16px;
+            resize: vertical;
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            border-color: #800020;
+        }
+
+        .row {
+            display: flex;
+            gap: 14px;
+        }
+
+        .summary-box {
+            border: 1px solid #ead6dc;
+            background: #faf7f8;
+            padding: 24px 28px;
+            margin-top: 24px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .summary-price {
+            font-size: 32px;
+            font-weight: 900;
+            color: #800020;
+        }
+
+        .btn-row {
+            margin-top: 30px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            min-width: 180px;
+            height: 56px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #800020;
+            color: #fff;
+            border: 1px solid #800020;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #800020;
+            border: 1px solid #800020;
+        }
+
+        @media (max-width: 1100px) {
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .wrap {
+                padding: 30px 24px 70px;
+            }
+
+            .logo {
+                font-size: 42px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/cart">장바구니</a>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="logo">H&amp;R</div>
+        <div class="title">주문 / 결제</div>
+
+        <form action="/order_complete" method="GET">
+            <div class="section">
+                <div class="section-title">배송 정보</div>
+                <input type="text" name="receiver" class="input" placeholder="받는 분" required>
+
+                <div class="row">
+                    <input type="text" name="phone" class="input" placeholder="연락처" required>
+                    <input type="text" name="zipcode" class="input" placeholder="우편번호" required>
+                </div>
+
+                <input type="text" name="address1" class="input" placeholder="주소" required>
+                <input type="text" name="address2" class="input" placeholder="상세주소">
+                <textarea name="memo" class="textarea" placeholder="배송 메모를 입력하세요"></textarea>
+            </div>
+
+            <div class="section">
+                <div class="section-title">결제 수단</div>
+                <select name="payment" class="select" required>
+                    <option value="card">신용/체크카드</option>
+                    <option value="bank">무통장입금</option>
+                    <option value="simple">간편결제</option>
+                </select>
+
+                <div class="summary-box">
+                    <div class="summary-title">결제를 진행하면 주문이 완료됩니다.</div>
+                    <div class="summary-price">결제 진행</div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <a href="/cart" class="btn btn-outline">장바구니로 돌아가기</a>
+                <button type="submit" class="btn btn-primary">주문 완료하기</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

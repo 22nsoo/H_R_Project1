@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ p.name }} - H&R</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .topbar a {
+            color: #fff;
+        }
+
+        .logout-btn {
+            border: 1px solid rgba(255,255,255,0.35);
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .wrap {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 34px 84px 70px;
+        }
+
+        .logo {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 28px;
+        }
+
+        .product-area {
+            display: flex;
+            gap: 56px;
+            align-items: flex-start;
+        }
+
+        .img-box {
+            width: 520px;
+            height: 640px;
+            background: #f4f4f4;
+            border: 1px solid #ececec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f4f4f4;
+        }
+
+        .info-box {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .brand {
+            font-size: 18px;
+            color: #666;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .name {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 18px;
+            line-height: 1.25;
+        }
+
+        .price {
+            font-size: 42px;
+            font-weight: 900;
+            color: #800020;
+            margin-bottom: 26px;
+        }
+
+        .desc {
+            font-size: 17px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .size-line {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .recommend-box {
+            background: #faf7f8;
+            border: 1px solid #ead6dc;
+            padding: 26px 28px;
+            margin-bottom: 28px;
+        }
+
+        .recommend-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #800020;
+            margin-bottom: 14px;
+        }
+
+        .recommend-main {
+            font-size: 30px;
+            font-weight: 900;
+            color: #111;
+            margin-bottom: 10px;
+        }
+
+        .recommend-sub {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            min-width: 180px;
+            height: 56px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #800020;
+            color: #fff;
+            border: 1px solid #800020;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #800020;
+            border: 1px solid #800020;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            text-decoration: none;
+            color: #800020;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .review-section {
+            margin-top: 70px;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 34px;
+        }
+
+        .review-title {
+            font-size: 30px;
+            font-weight: 900;
+            margin-bottom: 24px;
+        }
+
+        .review-card {
+            border-bottom: 1px solid #ececec;
+            padding: 24px 0;
+        }
+
+        .review-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .review-user {
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .review-date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .tag-wrap {
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border: 1px solid #e1c7cf;
+            background: #faf7f8;
+            color: #800020;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .body-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .review-text {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .empty-box {
+            border: 1px solid #ececec;
+            background: #fafafa;
+            padding: 50px 20px;
+            text-align: center;
+            color: #888;
+            font-size: 15px;
+        }
+
+        @media (max-width: 1100px) {
+            .wrap {
+                padding: 24px 24px 60px;
+            }
+
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .product-area {
+                flex-direction: column;
+            }
+
+            .img-box {
+                width: 100%;
+                height: 520px;
+            }
+
+            .logo {
+                font-size: 44px;
+            }
+
+            .name {
+                font-size: 32px;
+            }
+
+            .price {
+                font-size: 34px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/cart">장바구니</a>
+            {% if session.get('user_name') %}
+                <span>{{ session.get('user_name') }}님</span>
+                <a href="/logout" class="logout-btn">로그아웃</a>
+            {% else %}
+                <a href="/login">로그인</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="logo">H&amp;R</div>
+
+        <div class="product-area">
+            <div class="img-box">
+                {% if p.img %}
+                    <img src="{{ p.img }}" alt="{{ p.name }}">
+                {% else %}
+                    IMAGE
+                {% endif %}
+            </div>
+
+            <div class="info-box">
+                <div class="brand">{{ p.brand }}</div>
+                <div class="name">{{ p.name }}</div>
+                <div class="price">{{ "{:,}".format(p.price) }}원</div>
+                <div class="desc">{{ p.desc }}</div>
+
+                {% if p.size_options %}
+                <div class="size-line"><strong>사이즈 옵션</strong> : {{ p.size_options }}</div>
+                {% endif %}
+
+                <div class="recommend-box">
+                    <div class="recommend-title">리뷰 기반 사이즈 추천</div>
+
+                    {% if recommendation %}
+                        {% if recommendation.recommended_size %}
+                            <div class="recommend-main">추천 사이즈 : {{ recommendation.recommended_size }}</div>
+                        {% else %}
+                            <div class="recommend-main">추천 결과 없음</div>
+                        {% endif %}
+
+                        {% if recommendation.message %}
+                            <div class="recommend-sub">{{ recommendation.message }}</div>
+                        {% endif %}
+
+                        {% if recommendation.match_count is defined %}
+                            <div class="recommend-sub">비슷한 체형 리뷰 수 : {{ recommendation.match_count }}개</div>
+                        {% endif %}
+
+                        {% if recommendation.avg_rating is defined and recommendation.avg_rating %}
+                            <div class="recommend-sub">유사 사용자 평균 만족도 : {{ recommendation.avg_rating }} / 5</div>
+                        {% endif %}
+
+                        {% if recommendation.summary %}
+                            <div class="recommend-sub">{{ recommendation.summary }}</div>
+                        {% endif %}
+                    {% else %}
+                        {% if session.get('user_id') %}
+                            <div class="recommend-sub">추천 데이터를 불러오는 중이거나 아직 충분한 리뷰가 없습니다.</div>
+                        {% else %}
+                            <div class="recommend-sub">로그인하면 내 체형 기준으로 추천 사이즈를 볼 수 있어요.</div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="btn-row">
+                    <a href="{{ url_for('order_page', p_id=p.id) }}" class="btn btn-primary">바로 구매하기</a>
+                    <a href="{{ url_for('add_cart', p_id=p.id) }}" class="btn btn-outline">장바구니 담기</a>
+
+                    {% if session.get('user_id') %}
+                        <a href="{{ url_for('review_create', product_id=p.id) }}" class="btn btn-outline">리뷰 작성하기</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline">로그인 후 리뷰 작성</a>
+                    {% endif %}
+                </div>
+
+                <a href="/main" class="back-link">← 메인으로 돌아가기</a>
+            </div>
+        </div>
+
+        <div class="review-section">
+            <div class="review-title">상품 리뷰</div>
+
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-head">
+                        <div class="review-user">{{ review.username }}</div>
+                        <div class="review-date">{{ review.created_at }}</div>
+                    </div>
+
+                    <div class="tag-wrap">
+                        <span class="tag">구매 사이즈 {{ review.purchased_size }}</span>
+                        {% if review.size_feel %}<span class="tag">사이즈감 {{ review.size_feel }}</span>{% endif %}
+                        {% if review.fit_feel %}<span class="tag">핏 {{ review.fit_feel }}</span>{% endif %}
+                        {% if review.rating %}<span class="tag">평점 {{ review.rating }}/5</span>{% endif %}
+                    </div>
+
+                    {% if review.height or review.weight or review.preferred_fit %}
+                    <div class="body-info">
+                        체형 정보 :
+                        {% if review.height %} {{ review.height }}cm{% endif %}
+                        {% if review.weight %} / {{ review.weight }}kg{% endif %}
+                        {% if review.preferred_fit %} / {{ review.preferred_fit }} 선호{% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="review-text">{{ review.review_text }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-box">아직 등록된 리뷰가 없습니다. 첫 리뷰를 남겨보세요.</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
