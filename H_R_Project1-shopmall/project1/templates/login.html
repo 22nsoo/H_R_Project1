@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - H&R</title>
+    <style>
+        /* 기본 설정 및 폰트 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 상단 네비게이션 바 */
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        /* 중앙 정렬 컨테이너 */
+        .wrap {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 80px 20px 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 로고 디자인 */
+        .logo {
+            font-size: 52px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* 알림 메시지 (Flask Flash) */
+        .flash {
+            width: 100%;
+            border: 1px solid #ead6dc;
+            background: #faf7f8;
+            color: #800020;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* 입력 폼 */
+        form {
+            width: 100%;
+        }
+
+        .input {
+            width: 100%;
+            height: 54px;
+            padding: 0 15px;
+            border: 1px solid #f2f2f2;
+            border-radius: 8px;
+            background: #f9f9f9;
+            font-size: 15px;
+            margin-bottom: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input:focus {
+            border-color: #800020;
+            background: #fff;
+        }
+
+        /* 메인 로그인 버튼 */
+        .btn-login {
+            width: 100%;
+            height: 54px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 5px;
+            transition: opacity 0.3s;
+        }
+
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+
+        /* 신규 가입 혜택 안내 */
+        .promo-text {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 30px 0 15px 0;
+            color: #333;
+        }
+
+        /* 소셜 및 서브 버튼 스타일 */
+        .social-box {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-sub {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 54px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            position: relative;
+            border: 1px solid #ddd;
+        }
+
+        .btn-kakao {
+            background: #FEE500;
+            color: #3C1E1E;
+            border: none;
+        }
+
+        .btn-apple {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-signup {
+            background: #fff;
+            color: #000;
+            border: 1px solid #111;
+        }
+
+        .social-icon {
+            position: absolute;
+            left: 20px;
+        }
+
+        /* 링크 모음 */
+        .sub-links {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .sub-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .wrap {
+                padding-top: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/signup">회원가입</a>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <a href="/main" class="logo">H&amp;R</a>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
+            <input type="text" name="user_id" class="input" placeholder="아이디" required>
+            <input type="password" name="user_pw" class="input" placeholder="비밀번호" required>
+            <button type="submit" class="btn-login">로그인</button>
+        </form>
+
+        <div class="sub-links">
+            <a href="#">아이디 찾기</a>
+            <span>|</span>
+            <a href="#">비밀번호 찾기</a>
+        </div>
+
+        <div class="promo-text">
+            지금 가입하면, 신규 할인 쿠폰 즉시 발급
+        </div>
+
+        <div class="social-box">
+            <a href="#" class="btn-sub btn-kakao">
+                <svg class="social-icon" viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                        d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.091l-1.099 4.032c-.052.193.06.393.25.464.062.024.128.034.192.034.135 0 .265-.054.356-.154l4.73-5.204c.404.032.817.047 1.256.047 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"
+                        fill="#3C1E1E" />
+                </svg>
+                카카오로 시작하기
+            </a>
+
+            <a href="#" class="btn-sub btn-apple">
+                <svg class="social-icon" viewBox="0 0 24 24" width="18" height="18">
+                    <path
+                        d="M17.05 20.28c-.96.95-2.15 1.5-3.44 1.5-1.18 0-2.06-.38-3.08-.38-1.04 0-2.13.38-3.13.38-1.4 0-2.73-.7-3.8-1.85-2.14-2.3-2.14-5.95 0-8.25 1.07-1.14 2.4-1.84 3.8-1.84 1 0 1.9.34 2.87.34.94 0 2.1-.38 3.25-.38 1.14 0 2.18.44 2.97 1.13-2.6 1.43-2.15 5.37.58 6.55-.58 1.4-1.3 2.76-2.22 3.75zM12.03 7.25c-.02-2.13 1.73-3.93 3.84-4.05.18 2.24-1.93 4.14-3.84 4.05z"
+                        fill="#000" />
+                </svg>
+                Apple로 시작하기
+            </a>
+
+            <a href="/signup" class="btn-sub btn-signup">
+                회원가입
+            </a>
+        </div>
+    </div>
+
+</body>
+
+</html>

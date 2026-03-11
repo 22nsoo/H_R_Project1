@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰 작성 - H&R</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 46px 24px 80px;
+        }
+
+        .logo {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 34px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .sub {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 34px;
+        }
+
+        .card {
+            border: 1px solid #e8e8e8;
+            background: #fff;
+            padding: 34px;
+        }
+
+        .product-box {
+            background: #faf7f8;
+            border: 1px solid #ead6dc;
+            padding: 20px 22px;
+            margin-bottom: 26px;
+        }
+
+        .product-name {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .product-meta {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 700;
+            margin-bottom: 8px;
+            margin-top: 18px;
+        }
+
+        .select,
+        .textarea {
+            width: 100%;
+            border: 1px solid #d8c8ce;
+            background: #fff;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .select {
+            height: 56px;
+            padding: 0 16px;
+        }
+
+        .textarea {
+            min-height: 160px;
+            padding: 16px;
+            resize: vertical;
+            line-height: 1.7;
+        }
+
+        .select:focus,
+        .textarea:focus {
+            border-color: #800020;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .btn {
+            min-width: 180px;
+            height: 56px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            border: 1px solid #800020;
+            background: #800020;
+            color: #fff;
+        }
+
+        .btn-outline {
+            border: 1px solid #800020;
+            background: #fff;
+            color: #800020;
+        }
+
+        .flash {
+            border: 1px solid #ead6dc;
+            background: #faf7f8;
+            color: #800020;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .logo {
+                font-size: 42px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/cart">장바구니</a>
+            {% if session.get('user_name') %}
+            <span>{{ session.get('user_name') }}님</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="logo">H&amp;R</div>
+        <div class="title">리뷰 작성</div>
+        <div class="sub">구매 경험을 남겨주면 비슷한 체형 사용자에게 더 정확한 추천이 제공돼요.</div>
+
+        <div class="card">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <div class="product-box">
+                <div class="product-name">{{ product.product_name }}</div>
+                <div class="product-meta">
+                    {{ product.brand }} · {{ "{:,}".format(product.price) }}원
+                    {% if product.size_options %}
+                    · 사이즈 옵션: {{ product.size_options }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="post">
+                <div class="label">구매한 사이즈</div>
+                <select name="purchased_size" class="select" required>
+                    {% for s in product.size_options.split(',') %}
+                    <option value="{{ s.strip() }}">{{ s.strip() }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="label">사이즈 체감</div>
+                <select name="size_feel" class="select" required>
+                    <option value="작음">작음</option>
+                    <option value="정사이즈" selected>정사이즈</option>
+                    <option value="큼">큼</option>
+                </select>
+
+                <div class="label">핏 체감</div>
+                <select name="fit_feel" class="select" required>
+                    <option value="슬림핏">슬림핏</option>
+                    <option value="정핏">정핏</option>
+                    <option value="세미오버핏" selected>세미오버핏</option>
+                    <option value="오버핏">오버핏</option>
+                </select>
+
+                <div class="label">만족도</div>
+                <select name="rating" class="select" required>
+                    <option value="5">5점</option>
+                    <option value="4">4점</option>
+                    <option value="3">3점</option>
+                    <option value="2">2점</option>
+                    <option value="1">1점</option>
+                </select>
+
+                <div class="label">리뷰 내용</div>
+                <textarea name="review_text" class="textarea"
+                    placeholder="예: 정사이즈 느낌이고 어깨가 편해요. 세미오버핏으로 입기 좋았고 전반적으로 만족합니다." required></textarea>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn btn-primary">리뷰 등록</button>
+                    <a href="{{ url_for('product_detail', p_id=product.product_id) }}" class="btn btn-outline">돌아가기</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

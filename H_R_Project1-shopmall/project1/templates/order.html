@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문/결제 - H&R</title>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        /* 기본 레이아웃 및 폰트 설정 */
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background: #fff !important;
+            color: #000 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* 상단바(Topbar) 스타일 */
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .topbar a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            gap: 26px;
+        }
+
+        /* 메인 컨테이너 디자인 */
+        .order-container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 5vh;
+            margin-bottom: 80px;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .order-box {
+            background: #fff !important;
+            padding: 40px;
+            border: 1px solid #eee !important;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+            color: #000;
+        }
+
+        /* 섹션 및 입력창 스타일 */
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #800020;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #800020;
+            padding-bottom: 5px;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+            border: 1px solid #e8e8e8;
+            outline: none;
+            background: #fff;
+            font-size: 14px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            border-color: #800020;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 주소 검색 버튼 스타일 */
+        .address-btn {
+            width: 140px;
+            height: 43px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+
+        .address-btn:hover {
+            background: #333;
+        }
+
+        .textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 25px 0;
+        }
+
+        /* 최종 합계/결제 안내 박스 */
+        .summary-box {
+            background: #faf7f8;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .summary-price {
+            font-size: 24px;
+            font-weight: 900;
+            color: #800020;
+        }
+
+        /* 버튼 스타일 */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pay-btn {
+            flex: 2;
+            padding: 18px;
+            background: #800020 !important;
+            color: #fff !important;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .back-btn {
+            flex: 1;
+            padding: 18px;
+            background: #fff;
+            color: #800020;
+            border: 1px solid #800020;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .pay-btn:hover {
+            background: #600018 !important;
+        }
+
+        /* 푸터 스타일 */
+        .site-footer {
+            width: 100%;
+            background-color: #fff;
+            color: #000;
+            padding: 60px 0;
+            border-top: 1px solid #eee;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -1.5px;
+            color: #800020;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .address-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/cart">장바구니</a>
+        </div>
+    </div>
+
+    <div class="order-container">
+        <div class="order-box">
+            <h2>ORDER / PAYMENT</h2>
+
+            <form action="/order_complete" method="GET">
+                <div class="section-title">배송 정보</div>
+                <input type="text" name="receiver" class="input" placeholder="받는 분" required>
+
+                <input type="text" name="phone" class="input" placeholder="연락처 (- 제외)" required>
+
+                <div class="row">
+                    <input type="text" id="zipcode" name="zipcode" class="input" placeholder="우편번호" readonly required>
+                    <button type="button" class="address-btn" onclick="execDaumPostcode()">주소 검색</button>
+                </div>
+
+                <input type="text" id="address1" name="address1" class="input" placeholder="주소" readonly required>
+                <input type="text" id="address2" name="address2" class="input" placeholder="상세주소">
+                <textarea name="memo" class="textarea" placeholder="배송 메모를 입력하세요"></textarea>
+
+                <hr>
+
+                <div class="section-title">결제 수단</div>
+                <select name="payment" class="select" required>
+                    <option value="card">신용/체크카드</option>
+                    <option value="bank">무통장입금</option>
+                    <option value="simple">간편결제</option>
+                </select>
+
+                <div class="summary-box">
+                    <p style="color: #888; font-size: 13px; margin: 0 0 10px 0;">최종 결제 금액을 확인하셨나요?</p>
+                    <div class="summary-price">결제 진행하기</div>
+                </div>
+
+                <div class="btn-row">
+                    <a href="/cart" class="back-btn">이전으로</a>
+                    <button type="submit" class="pay-btn">결제하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-logo">
+            <a href="/main" style="text-decoration: none;">
+                <span class="logo-text">H<span style="font-style: italic;">&</span>R</span>
+            </a>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+            <p>Hyundai Rotem & AI Defense Industry Bootcamp Project</p>
+        </div>
+    </footer>
+
+    <script>
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    var addr = '';
+                    if (data.userSelectedType === 'R') {
+                        addr = data.roadAddress;
+                    } else {
+                        addr = data.jibunAddress;
+                    }
+
+                    // 선택된 데이터를 각 필드에 넣음
+                    document.getElementById('zipcode').value = data.zonecode;
+                    document.getElementById("address1").value = addr;
+                    // 주소 입력 후 상세주소 칸으로 자동 포커스 이동
+                    document.getElementById("address2").focus();
+                }
+            }).open();
+        }
+    </script>
+</body>
+
+</html>
