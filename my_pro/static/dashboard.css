@@ -303,24 +303,10 @@ td {
     background: #fffaf0;
     color: #dd6b20;
 }
-.badge.new{
-background:#edf2ff;
-color:#4c51bf;
-}
-
-.badge.ready{
-background:#fffaf0;
-color:#dd6b20;
-}
 
 .badge.shipping{
 background:#ebf8ff;
 color:#3182ce;
-}
-
-.badge.done{
-background:#e6fffa;
-color:#319795;
 }
 
 .badge.cancel{
@@ -336,6 +322,23 @@ color:#c53030;
 .badge.exchange{
 background:#faf5ff;
 color:#805ad5;
+}
+/* 접수 */
+.badge.new{
+background:#fff3cd;
+color:#856404;
+}
+
+/* 처리중 */
+.badge.ready{
+background:#ffe0b2;
+color:#e65100;
+}
+
+/* 완료 */
+.badge.done{
+background:#d4edda;
+color:#155724;
 }
 /* Buttons */
 .action-btn,
@@ -491,4 +494,112 @@ select {
 
 .filter-bar button{
     padding:10px 14px;
+}
+
+
+.cs-form{
+display:flex;
+align-items:center;
+gap:6px;
+padding:4px 6px
+}
+
+.cs-select{
+width:110px;
+height:32px;
+padding:4px;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:12px;
+}
+
+.cs-btn{
+padding:4px 10px;
+font-size:12px;
+background:#3b82f6;
+color:white;
+border:none;
+border-radius:4px;
+cursor:pointer;
+white-space: nowrap;
+}
+
+
+.cs-btn:hover{
+background:var(--primary-dark);
+transform:translateY(-1px);
+box-shadow:0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* 답변 입력 영역 */
+.reply-box{
+width:100%;
+min-height:60px;
+padding:8px;
+border:1px solid #ccc;
+border-radius:6px;
+font-size:13px;
+resize:vertical;
+}
+
+/* 답변 버튼 */
+.reply-btn{
+margin-top:6px;
+padding:4px 10px;
+font-size:12px;
+background:#3b82f6;
+color:white;
+border:none;
+border-radius:4px;
+cursor:pointer;
+
+white-space: nowrap;
+}
+
+.reply-btn:hover{
+background:#2563eb;
+}
+
+
+.delete-btn{
+
+background:white;
+color:black;
+border:1px solid #333;
+padding:4px 10px;
+font-size:12px;
+border-radius:4px;
+cursor:pointer;
+margin-bottom:10px;
+
+}
+
+.delete-btn:hover{
+
+background:#f5f5f5;
+
+}
+.pagination{
+margin-top:15px;
+text-align:center;
+}
+
+.pagination a{
+display:inline-block;
+padding:4px 10px;
+border:1px solid #ccc;
+margin:2px;
+text-decoration:none;
+color:#333;
+font-size:13px;
+}
+.pagination a.active{
+background:#f2f2f2;
+color:#333;
+}
+/* 처리 컬럼 위치 조정 */
+th:nth-child(8),
+td:nth-child(8){
+    width:180px;
+    text-align:center;
 }

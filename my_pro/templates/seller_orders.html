@@ -14,6 +14,7 @@
                 <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
                 <li><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
                 <li class="active"><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
+                <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
                 <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
             </ul>
         </aside>

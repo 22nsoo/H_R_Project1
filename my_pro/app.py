@@ -75,7 +75,7 @@ def seller_dashboard(seller_id):
     SELECT COUNT(*) AS cs_count
     FROM customer_service
     WHERE seller_id = %s
-    AND cs_status != '완료'
+    AND cs_status IN ('접수','처리중')
     """, (seller_id,))
     cs_count = int(cursor.fetchone()["cs_count"] or 0)
     
@@ -481,10 +481,26 @@ def seller_orders(seller_id):
 @app.route("/seller/cs/<int:seller_id>")
 def seller_cs(seller_id):
 
+    page_q = request.args.get("page_q", 1, type=int)
+    page_r = request.args.get("page_r", 1, type=int)
+
+    per_page = 5
+
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # 상품 문의
+    # =====================
+    # 상품 문의 개수
+    # =====================
+    cursor.execute("""
+        SELECT COUNT(*) as cnt
+        FROM customer_service
+        WHERE seller_id=%s
+        AND cs_type='상품문의'
+    """, (seller_id,))
+    total_q = cursor.fetchone()["cnt"]
+
+    # 상품 문의 데이터
     cursor.execute("""
         SELECT
             cs.cs_id,
@@ -499,11 +515,29 @@ def seller_cs(seller_id):
         JOIN products p ON cs.product_id = p.product_id
         WHERE cs.seller_id=%s
         AND cs.cs_type='상품문의'
-        ORDER BY cs.created_at DESC
-    """, (seller_id,))
+        ORDER BY
+            CASE cs.cs_status
+                WHEN '접수' THEN 0
+                WHEN '처리완료' THEN 1
+            END,
+            cs.created_at DESC
+        LIMIT %s OFFSET %s
+    """, (seller_id, per_page, (page_q-1)*per_page))
+
     questions = cursor.fetchall()
 
-    # 교환 / 반품 요청
+    # =====================
+    # 교환 / 반품 개수
+    # =====================
+    cursor.execute("""
+        SELECT COUNT(*) as cnt
+        FROM customer_service
+        WHERE seller_id=%s
+        AND cs_type IN ('교환요청','반품요청')
+    """, (seller_id,))
+    total_r = cursor.fetchone()["cnt"]
+
+    # 교환 / 반품 데이터
     cursor.execute("""
         SELECT
             cs.cs_id,
@@ -518,18 +552,33 @@ def seller_cs(seller_id):
         JOIN products p ON cs.product_id = p.product_id
         WHERE cs.seller_id=%s
         AND cs.cs_type IN ('교환요청','반품요청')
-        ORDER BY cs.created_at DESC
-    """, (seller_id,))
+        ORDER BY
+            CASE cs.cs_status
+                WHEN '접수' THEN 0
+                WHEN '처리중' THEN 1
+                WHEN '처리완료' THEN 2
+            END,
+            cs.created_at DESC
+        LIMIT %s OFFSET %s
+    """, (seller_id, per_page, (page_r-1)*per_page))
+
     returns = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
+    total_pages_q = (total_q + per_page - 1) // per_page
+    total_pages_r = (total_r + per_page - 1) // per_page
+
     return render_template(
         "seller_cs.html",
         questions=questions,
         returns=returns,
-        seller_id=seller_id
+        seller_id=seller_id,
+        page_q=page_q,
+        page_r=page_r,
+        total_pages_q=total_pages_q,
+        total_pages_r=total_pages_r
     )
 
 # 답변 등록 기능
@@ -555,7 +604,27 @@ def reply_cs(cs_id):
 
     return redirect(request.referrer)
 
+@app.route("/seller/cs/status/<int:cs_id>", methods=["POST"])
+def update_cs_status(cs_id):
 
+    new_status = request.form.get("cs_status")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE customer_service
+        SET cs_status=%s
+        WHERE cs_id=%s
+    """,(new_status,cs_id))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect(request.referrer)
+    
 @app.route("/seller/order/status/<int:order_id>", methods=["POST"])
 def update_order_status(order_id):
     new_status = request.form.get("order_status", "").strip()
@@ -591,5 +660,29 @@ def update_order_status(order_id):
     return redirect(url_for("seller_orders", seller_id=seller_id))
 
 
+# 삭제 
+@app.route("/seller/cs/delete", methods=["POST"])
+def delete_cs():
+
+    ids = request.form.getlist("delete_ids")
+
+    if not ids:
+        return redirect(request.referrer)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    for cs_id in ids:
+        cursor.execute(
+            "DELETE FROM customer_service WHERE cs_id=%s",
+            (cs_id,)
+        )
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect(request.referrer)
 if __name__ == "__main__":
     app.run(debug=True)
