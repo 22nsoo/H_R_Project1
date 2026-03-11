@@ -151,8 +151,8 @@ def seller_dashboard(seller_id):
             COALESCE(SUM(total_amount), 0) AS daily_sales
         FROM orders
         WHERE seller_id = %s
-        AND order_status != '취소'
-        AND order_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        AND YEAR(order_date) = YEAR(CURDATE())
+        AND MONTH(order_date) = MONTH(CURDATE())
         GROUP BY DATE(order_date)
         ORDER BY sales_date ASC
     """, (seller_id,))
@@ -161,12 +161,16 @@ def seller_dashboard(seller_id):
     for row in cursor.fetchall():
         sales_map[str(row["sales_date"])] = int(row["daily_sales"] or 0)
 
+    today = date.today()
+
     labels = []
     values = []
-    for i in range(6, -1, -1):
-        d = date.today() - timedelta(days=i)
-        labels.append(d.strftime("%m/%d"))
-        values.append(int(sales_map.get(str(d), 0)))
+
+    for d in range(1, today.day + 1):
+        day = date(today.year, today.month, d)
+
+        labels.append(day.strftime("%m/%d"))
+        values.append(int(sales_map.get(str(day), 0)))
 
     cursor.close()
     conn.close()

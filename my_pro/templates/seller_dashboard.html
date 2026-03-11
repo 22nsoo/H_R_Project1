@@ -66,9 +66,9 @@
             </section>
 
             <div class="dashboard-grid dashboard-grid-top">
-                <div class="panel">
-                    <h2>일별 매출 현황</h2>
-                    <canvas id="salesChart" height="150"></canvas>
+                <div class="chart-scroll">
+                    <h2>일매출 현황</h2>
+                    <canvas id="salesChart"></canvas>
                 </div>
 
                 <div class="panel">
@@ -178,31 +178,52 @@
         </main>
     </div>
 
-    <script>
-        const ctx = document.getElementById("salesChart").getContext("2d");
+<script>
+const labels = {{ chart_labels | safe }};
+const values = {{ chart_values | safe }};
 
-        new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: {{ chart_labels | safe }},
-                datasets: [{
-                    label: "매출액",
-                    data: {{ chart_values | safe }},
-                    borderColor: "#2f6bff",
-                    backgroundColor: "rgba(47, 107, 255, 0.1)",
-                    fill: true,
-                    tension: 0.4
-                }]
+const ctx = document.getElementById("salesChart").getContext("2d");
+
+new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: labels,
+        datasets: [{
+            data: values,
+            borderColor: "#2f6bff",
+            backgroundColor: "rgba(47, 107, 255, 0.1)",
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
+        plugins: {
+            legend: {
+                display: false
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
+            tooltip: {
+                enabled: true,
+                callbacks: {
+                    label: function(context) {
+                        return context.raw.toLocaleString() + "원";
                     }
                 }
             }
-        });
-    </script>
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
 </body>
 </html>

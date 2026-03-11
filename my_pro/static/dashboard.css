@@ -603,3 +603,13 @@ td:nth-child(8){
     width:180px;
     text-align:center;
 }
+
+/*좌우 스크롤*/
+.chart-scroll{
+    overflow-x:auto;
+    width:100%;
+}
+
+.chart-scroll canvas{
+    min-width:1300px;
+}
