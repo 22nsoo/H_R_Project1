@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>주문/결제</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: #000;
+            /* 배경 검정 */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .order-box {
+            background: #1a1a1a;
+            /* 박스는 약간 밝은 검정 */
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+
+        .info-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #333;
+            margin: 25px 0;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 18px;
+            background: #fff;
+            /* 버튼은 반대로 흰색 */
+            color: #000;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .pay-btn:hover {
+            background: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="order-box">
+        <h2>ORDER / PAYMENT</h2>
+        <div class="info-line"><span>배송지</span><strong>서울시 강남구</strong></div>
+        <div class="info-line"><span>결제수단</span><strong>신용카드 / 페이</strong></div>
+        <hr>
+        <p style="color: #888; font-size: 13px; margin-bottom: 20px;">최종 결제 금액을 확인하셨나요?</p>
+        <button onclick="location.href='/order_complete'" class="pay-btn">결제하기</button>
+    </div>
+</body>
+
+</html>
