@@ -59,7 +59,7 @@
                         {% for p in products %}
                         <tr>
                             <td>
-                                <img class="table-thumb" src="{{ p['image_url'] or 'https://via.placeholder.com/60' }}" alt="상품이미지">
+                                <img class="table-thumb" src="{{ p['image_main1'] or 'https://via.placeholder.com/60' }}" alt="상품이미지">
                             </td>
                             <td>{{ p["product_name"] }}</td>
                             <td>{{ p["category"] }}</td>
