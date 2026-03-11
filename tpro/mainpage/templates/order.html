@@ -34,25 +34,33 @@
     <style>
         body {
             font-family: 'Pretendard', sans-serif;
-            background: #000;
-            /* 배경 검정 */
-            color: #fff;
+            background: #fff !important;
+            /* 배경은 화이트 */
+            color: #000 !important;
+
+            /* [수정] 요소들을 세로로 배치하도록 변경 */
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
+            /* 가로 중앙 정렬 */
+            min-height: 100vh;
+            /* 화면 높이를 최소 100%로 유지 */
             margin: 0;
         }
 
         .order-box {
-            background: #1a1a1a;
-            /* 박스는 약간 밝은 검정 */
+            background: #fff !important;
             padding: 50px;
             width: 100%;
             max-width: 450px;
-            border: 1px solid #333;
+            border: 1px solid #eee !important;
             border-radius: 12px;
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+            /* [추가] 결제창과 푸터 사이의 간격 확보 */
+            margin-top: 10vh;
+            margin-bottom: 50px;
         }
 
         h2 {
@@ -91,6 +99,44 @@
         .pay-btn:hover {
             background: #ddd;
         }
+
+        .site-footer {
+            width: 100%;
+            /* 푸터가 화면 가로를 꽉 채우도록 */
+            background-color: #fff;
+            color: #000;
+            padding: 60px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            margin-top: auto;
+            /* 푸터를 항상 맨 아래로 밀어냄 */
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -1.5px;
+            color: #800020;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .footer-links {
+            margin-top: 30px;
+        }
+
+        .footer-links a {
+            color: #800020;
+            text-decoration: none;
+            font-size: 12px;
+            margin: 0 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
@@ -103,6 +149,17 @@
         <p style="color: #888; font-size: 13px; margin-bottom: 20px;">최종 결제 금액을 확인하셨나요?</p>
         <button onclick="location.href='/order_complete'" class="pay-btn">결제하기</button>
     </div>
+    <footer class="site-footer">
+        <div class="footer-logo">
+            <a href="/main" style="text-decoration: none;">
+                <span class="logo-text">H<span class="amp">&</span>R</span>
+            </a>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+            <p>Hyundai Rotem & AI Defense Industry Bootcamp Project</p>
+        </div>
+    </footer>
 </body>
 
 </html>
