@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>내 장바구니 - H&R</title>
+    <style>
+        /* 1. 기본 스타일 리셋 및 공통 설정 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            /* 현대적인 폰트 지향 */
+            background: #fff;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 2. 상단 바 (H&R 아이덴티티) */
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        /* 3. 레이아웃 컨테이너 */
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 42px 20px 90px;
+        }
+
+        .logo-main {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .title {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #111;
+            padding-bottom: 15px;
+        }
+
+        /* 4. 장바구니 테이블 스타일 */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cart-table th {
+            background: #faf7f8;
+            color: #800020;
+            font-weight: 800;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .cart-table td {
+            padding: 20px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* 상품 정보 셀 */
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .product-img {
+            width: 80px;
+            height: 100px;
+            background: #f4f4f4;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-img {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #aaa;
+            background: #eee;
+        }
+
+        .brand {
+            font-size: 12px;
+            color: #888;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        /* 수량 조절 버튼 */
+        .qty-box {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .qty-val {
+            width: 40px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+
+        /* 5. 금액 요약 박스 */
+        .summary-box {
+            margin-top: 30px;
+            background: #faf7f8;
+            padding: 30px;
+            border: 1px solid #ead6dc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-label {
+            font-size: 18px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .summary-price {
+            font-size: 28px;
+            font-weight: 900;
+            color: #800020;
+        }
+
+        /* 6. 버튼 영역 */
+        .btn-row {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 56px;
+            min-width: 200px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 4px;
+        }
+
+        .btn-outline {
+            border: 1px solid #800020;
+            color: #800020;
+            background: #fff;
+        }
+
+        .btn-outline:hover {
+            background: #faf7f8;
+        }
+
+        .btn-primary {
+            background: #800020;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #600018;
+        }
+
+        /* 7. 비어있는 상태 */
+        .empty-box {
+            padding: 100px 20px;
+            text-align: center;
+            border: 1px solid #eee;
+            margin: 20px 0;
+            color: #888;
+            font-size: 16px;
+        }
+
+        /* 8. 푸터 스타일 */
+        .site-footer {
+            background-color: #fff;
+            color: #000;
+            padding: 80px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -1.5px;
+            color: #800020;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/main">쇼핑 계속하기</a>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <a href="/main" class="logo-main">H&amp;R</a>
+        <div class="title">SHOPPING BAG</div>
+
+        {% if not items %}
+        <div class="empty-box">장바구니에 담긴 상품이 없습니다.</div>
+        <div class="btn-row">
+            <a href="/main" class="btn btn-primary">쇼핑하러 가기</a>
+        </div>
+        {% else %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">상품정보</th>
+                    <th style="width: 15%;">판매가</th>
+                    <th style="width: 15%;">수량</th>
+                    <th style="width: 15%;">합계</th>
+                    <th style="width: 5%;">선택</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div class="product-cell">
+                            <div class="product-img">
+                                {% if item.img %}
+                                <img src="{{ item.img }}" alt="{{ item.name }}">
+                                {% else %}
+                                <div class="no-img">NO IMAGE</div>
+                                {% endif %}
+                            </div>
+                            <div class="product-info">
+                                <div class="brand">{{ item.brand }}</div>
+                                <div class="name">{{ item.name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ "{:,}".format(item.price) }}원</td>
+                    <td>
+                        <div class="qty-box">
+                            <a href="/update_cart/{{ item.id }}/minus" class="qty-btn">-</a>
+                            <div class="qty-val">{{ item.qty }}</div>
+                            <a href="/update_cart/{{ item.id }}/plus" class="qty-btn">+</a>
+                        </div>
+                    </td>
+                    <td style="font-weight: bold;">{{ "{:,}".format(item.price * item.qty) }}원</td>
+                    <td>
+                        <a href="/update_cart/{{ item.id }}/delete"
+                            style="color: red; font-size: 13px; text-decoration: underline;">삭제</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="summary-box">
+            <div class="summary-label">총 결제 예정 금액</div>
+            <div class="summary-price">{{ "{:,}".format(total) }}원</div>
+        </div>
+
+        <div class="btn-row">
+            <a href="/main" class="btn btn-outline">쇼핑 계속하기</a>
+            <a href="/order" class="btn btn-primary">주문하기</a>
+        </div>
+        {% endif %}
+
+        <footer class="site-footer">
+            <div class="footer-logo">
+                <a href="/main" style="text-decoration: none;">
+                    <span class="logo-text">H<span style="font-style: italic;">&</span>R</span>
+                </a>
+            </div>
+            <div class="footer-info">
+                <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+                <p>Hyundai Rotem & AI Defense Industry Bootcamp Project</p>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

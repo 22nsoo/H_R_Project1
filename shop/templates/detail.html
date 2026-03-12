@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ p.name }} - H&R</title>
+    <style>
+        /* 기본 레이아웃 설정 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            background: #fff;
+            color: #111;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 상단 바 */
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .logout-btn {
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        /* 메인 컨텐츠 영역 */
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 84px 100px;
+        }
+
+        .logo-main {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        /* 상품 정보 레이아웃 */
+        .product-area {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .img-box {
+            width: 500px;
+            aspect-ratio: 3/4;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-box {
+            flex: 1;
+        }
+
+        .brand {
+            font-size: 18px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .name {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: 900;
+            color: #800020;
+            margin-bottom: 30px;
+        }
+
+        .desc {
+            font-size: 16px;
+            color: #555;
+            min-height: 120px;
+            margin-bottom: 30px;
+            white-space: pre-wrap;
+        }
+
+        /* 사이즈 추천 박스 */
+        .recommend-box {
+            background: #faf7f8;
+            border: 1px solid #ead6dc;
+            padding: 24px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .recommend-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #800020;
+            margin-bottom: 12px;
+        }
+
+        .recommend-main {
+            font-size: 24px;
+            font-weight: 900;
+            color: #111;
+            margin-bottom: 8px;
+        }
+
+        .recommend-sub {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 버튼 스타일 */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            height: 56px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 800;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #800020;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #111;
+            border: 1px solid #ddd;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 리뷰 섹션 */
+        .review-section {
+            margin-top: 80px;
+            border-top: 1px solid #eee;
+            padding-top: 50px;
+        }
+
+        .review-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 30px;
+        }
+
+        .review-card {
+            padding: 25px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f0f0f0;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 6px;
+            border-radius: 2px;
+        }
+
+        .tag-red {
+            background: #faf7f8;
+            color: #800020;
+            border: 1px solid #ead6dc;
+        }
+
+        /* 푸터 스타일 */
+        .site-footer {
+            background-color: #fff;
+            color: #000;
+            padding: 80px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -1.5px;
+            color: #800020;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .product-area {
+                flex-direction: column;
+            }
+
+            .img-box {
+                width: 100%;
+            }
+
+            .wrap {
+                padding: 40px 24px;
+            }
+
+            .topbar {
+                padding: 0 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/cart">장바구니</a>
+            {% if session.get('user_name') %}
+            <span>{{ session.get('user_name') }}님</span>
+            <a href="/logout" class="logout-btn">로그아웃</a>
+            {% else %}
+            <a href="/login">로그인</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="wrap">
+        <a href="/main" class="logo-main">H&amp;R</a>
+
+        <div class="product-area">
+            <div class="img-box">
+                {% if p.img %}
+                <img src="{{ p.img }}" alt="{{ p.name }}">
+                {% else %}
+                <span style="color:#ccc; font-weight:900;">NO IMAGE</span>
+                {% endif %}
+            </div>
+
+            <div class="info-box">
+                <div class="brand">{{ p.brand }}</div>
+                <h1 class="name">{{ p.name }}</h1>
+                <div class="price">{{ "{:,}".format(p.price) }}원</div>
+                <div class="desc">{{ p.desc }}</div>
+
+                {% if p.size_options %}
+                <div style="margin-bottom: 25px; font-size: 15px;">
+                    <strong>옵션 :</strong> {{ p.size_options }}
+                </div>
+                {% endif %}
+
+                <div class="recommend-box">
+                    <div class="recommend-title">리뷰 기반 사이즈 추천</div>
+                    {% if recommendation %}
+                    {% if recommendation.recommended_size %}
+                    <div class="recommend-main">추천 사이즈 : {{ recommendation.recommended_size }}</div>
+                    {% else %}
+                    <div class="recommend-main">데이터 분석 중</div>
+                    {% endif %}
+                    <div class="recommend-sub">
+                        {{ recommendation.message }}<br>
+                        {% if recommendation.match_count %}
+                        (비슷한 체형 리뷰 {{ recommendation.match_count }}건 분석 완료)
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="recommend-sub">
+                        {% if session.get('user_id') %}
+                        충분한 리뷰 데이터가 쌓이면 내 체형에 맞는 사이즈를 추천해 드립니다.
+                        {% else %}
+                        <a href="/login" style="color:#800020; font-weight:bold; text-decoration:underline;">로그인</a> 하시면
+                        고객님 체형에 맞는 사이즈를 추천해 드립니다.
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="btn-row">
+                    <a href="{{ url_for('order_page', p_id=p.id) }}" class="btn btn-primary">바로 구매하기</a>
+                    <a href="{{ url_for('add_cart', p_id=p.id) }}" class="btn btn-outline">장바구니 담기</a>
+                </div>
+
+                <div class="btn-row">
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('review_create', product_id=p.id) }}" class="btn btn-outline"
+                        style="width: 100%;">리뷰 작성하기</a>
+                    {% endif %}
+                </div>
+
+                <a href="/main" class="back-link">← 메인으로 돌아가기</a>
+            </div>
+        </div>
+
+        <div class="review-section">
+            <div class="review-title">CUSTOMER REVIEWS</div>
+            {% if reviews %}
+            {% for review in reviews %}
+            <div class="review-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-weight:800;">{{ review.username }}</span>
+                    <span style="color:#999; font-size:12px;">{{ review.created_at }}</span>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <span class="tag tag-red">구매 사이즈 {{ review.purchased_size }}</span>
+                    {% if review.rating %}<span class="tag">평점 {{ review.rating }}/5</span>{% endif %}
+                    {% if review.size_feel %}<span class="tag">{{ review.size_feel }}</span>{% endif %}
+                </div>
+                {% if review.height or review.weight %}
+                <div style="font-size:13px; color:#888; margin-bottom:8px;">
+                    체형: {{ review.height }}cm / {{ review.weight }}kg
+                </div>
+                {% endif %}
+                <div style="font-size:15px; color:#333;">{{ review.review_text }}</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align:center; padding:50px; color:#999; border:1px solid #f5f5f5;">
+                아직 등록된 리뷰가 없습니다. 첫 번째 주인공이 되어보세요!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-logo">
+            <a href="/main">
+                <span class="logo-text">H<span style="font-style: italic;">&</span>R</span>
+            </a>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+            <p>Hyundai Rotem & AI Defense Industry Bootcamp Project</p>
+        </div>
+    </footer>
+</body>
+
+</html>
