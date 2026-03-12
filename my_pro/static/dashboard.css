@@ -748,3 +748,18 @@ display:flex;
 justify-content:flex-end;
 margin-top:10px;
 }
+
+/*그래프*/
+.sales-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+margin-top:20px;
+}
+
+.chart-box{
+background:white;
+padding:20px;
+border-radius:10px;
+height:420px;
+}

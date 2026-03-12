@@ -500,9 +500,9 @@ def seller_sales(seller_id):
     end_date = request.args.get("end_date")
 
     if not start_date:
-        start_date = date.today().replace(day=1)  # 이번달 1일
+        start_date = date.today().replace(day=1).strftime("%Y-%m-%d")
     if not end_date:
-        end_date = date.today()
+        end_date = date.today().strftime("%Y-%m-%d")
 
     # 판매자 정보
     cursor.execute(
@@ -524,6 +524,7 @@ def seller_sales(seller_id):
         SUM(total_amount) AS sales
         FROM orders
         WHERE seller_id=%s
+        AND order_status != '취소요청'
         AND DATE(order_date) BETWEEN %s AND %s
         GROUP BY DATE(order_date) 
         ORDER BY d DESC
@@ -531,6 +532,13 @@ def seller_sales(seller_id):
     """, (seller_id,start_date, end_date))
     daily_sales = cursor.fetchall()
 
+    daily_labels = []
+    daily_values = []
+
+    for row in daily_sales:
+        daily_labels.append(str(row["d"]))
+        daily_values.append(int(row["sales"] or 0))
+    
     # -------------------------
     # 월 매출
     # -------------------------
@@ -539,24 +547,40 @@ def seller_sales(seller_id):
         COALESCE(SUM(total_amount),0) AS sales
         FROM orders
         WHERE seller_id=%s
+        AND order_status != '취소요청'
         AND YEAR(order_date)=%s
         GROUP BY DATE_FORMAT(order_date,'%%Y-%%m')
         ORDER BY m DESC
     """, (seller_id,year))
     monthly_sales = cursor.fetchall()
+    
+    monthly_labels = []
+    monthly_values = []
+
+    for row in monthly_sales:
+        monthly_labels.append(row["m"])
+        monthly_values.append(int(row["sales"] or 0))
 
     # -------------------------
     # 연 매출
     # -------------------------
     cursor.execute("""
-        SELECT YEAR(order_date) AS y,
-            SUM(total_amount) AS sales
-        FROM orders
-        WHERE seller_id=%s
-        GROUP BY YEAR(order_date)
-        ORDER BY y DESC
-    """, (seller_id,))
+    SELECT YEAR(order_date) AS y,
+    SUM(total_amount) AS sales
+    FROM orders
+    WHERE seller_id=%s
+    GROUP BY YEAR(order_date)
+    ORDER BY y DESC
+    """,(seller_id,))
+
     yearly_sales = cursor.fetchall()
+
+    yearly_labels = []
+    yearly_values = []
+
+    for row in yearly_sales:
+        yearly_labels.append(str(row["y"]))
+        yearly_values.append(int(row["sales"] or 0))
 
     # -------------------------
     # 연도 목록 가져오기
@@ -578,7 +602,7 @@ def seller_sales(seller_id):
         COALESCE(SUM(total_amount),0) AS total_sales,
         COUNT(order_id) AS total_orders
     FROM orders
-    WHERE seller_id=%s
+    WHERE seller_id=%s 
     """,(seller_id,))
 
     summary = cursor.fetchone()
@@ -606,14 +630,20 @@ def seller_sales(seller_id):
 
         daily_sales=daily_sales,
         monthly_sales=monthly_sales,
-        yearly_sales=yearly_sales
+        yearly_sales=yearly_sales,
+
+        daily_labels=json.dumps(daily_labels),
+        daily_values=json.dumps(daily_values),
+
+        monthly_labels=json.dumps(monthly_labels),
+        monthly_values=json.dumps(monthly_values),
+
+        yearly_labels=json.dumps(yearly_labels),
+        yearly_values=json.dumps(yearly_values)
     )
     
 
-# 다운로드 CSV 추가
-import csv
-from flask import Response
-
+# 일 매출 다운로드 CSV 추가
 @app.route("/seller/sales/export/<int:seller_id>")
 def export_sales_csv(seller_id):
 
@@ -628,7 +658,8 @@ def export_sales_csv(seller_id):
             COUNT(order_id) AS order_count,
             SUM(total_amount) AS sales
         FROM orders
-        WHERE seller_id=%s
+        WHERE seller_id=%s 
+        AND order_status != '취소요청'
         AND DATE(order_date) BETWEEN %s AND %s
         GROUP BY DATE(order_date)
         ORDER BY date DESC
@@ -646,6 +677,86 @@ def export_sales_csv(seller_id):
             yield f"{r['date']},{r['order_count']},{r['sales']}\n"
 
     filename = f"sales_{start_date}_{end_date}.csv"
+
+    return Response(
+        generate(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename={filename}"}
+    )
+
+# 월 매출 CSV 다운로드
+@app.route("/seller/sales/export_month/<int:seller_id>")
+def export_month_sales_csv(seller_id):
+
+    year = request.args.get("year")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT DATE_FORMAT(order_date,'%%Y-%%m') AS month,
+        SUM(total_amount) AS sales
+        FROM orders
+        WHERE seller_id=%s
+        AND order_status != '취소요청'
+        AND YEAR(order_date)=%s
+        GROUP BY DATE_FORMAT(order_date,'%%Y-%%m')
+        ORDER BY month DESC
+    """,(seller_id,year))
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    def generate():
+        yield '\ufeff'
+        yield "월,매출\n"
+
+        for r in rows:
+            sales = r["sales"] or 0
+            yield f"{r['month']},{sales}\n"
+
+    filename = f"monthly_sales_{year}.csv"
+
+    return Response(
+        generate(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename={filename}"}
+    )
+
+
+# 연 매출 CSV 다운로드
+@app.route("/seller/sales/export_year/<int:seller_id>")
+def export_year_sales_csv(seller_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT YEAR(order_date) AS year,
+        SUM(total_amount) AS sales
+        FROM orders
+        WHERE seller_id=%s
+        AND order_status != '취소요청'
+        GROUP BY YEAR(order_date)
+        ORDER BY year DESC
+    """,(seller_id,))
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    def generate():
+        yield '\ufeff'
+        yield "연도,매출\n"
+
+        for r in rows:
+            sales = r["sales"] or 0
+            yield f"{r['year']},{sales}\n"
+
+    filename = "yearly_sales.csv"
 
     return Response(
         generate(),
@@ -762,7 +873,7 @@ def seller_cs(seller_id):
         page_q=page_q,
         page_r=page_r,
         total_pages_q=total_pages_q,
-        total_pages_r=total_pages_r
+        total_pages_r=total_pages_r,
     )
 
 # 답변 등록 기능

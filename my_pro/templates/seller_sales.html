@@ -3,40 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <title>매출 관리</title>
+
 <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
 
 <div class="layout">
 
+<!-- ======================= -->
 <!-- 사이드바 -->
+<!-- ======================= -->
+
 <aside class="sidebar">
+
 <div class="sidebar-title">판매자 메뉴</div>
 
 <ul class="menu">
+
 <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
 <li class="active"><a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">매출 관리</a></li>
 <li><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
 <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
 <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
 <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
+
 </ul>
+
 </aside>
+
 
 
 <main class="main">
 
+<!-- ======================= -->
 <!-- 상단 -->
+<!-- ======================= -->
+
 <header class="topbar">
+
 <h1>매출 관리</h1>
+
 <div class="seller-info">
 <strong>{{ seller["seller_name"] }}</strong> 매출 관리
 </div>
+
 </header>
 
 
+
+<!-- ======================= -->
 <!-- 요약 카드 -->
+<!-- ======================= -->
+
 <section class="summary-cards">
 
 <div class="summary-card">
@@ -57,24 +79,26 @@
 </section>
 
 
-<!-- ===================== -->
-<!-- 일 매출 -->
-<!-- ===================== -->
+
+<!-- ======================= -->
+<!-- 일 매출 + 그래프 -->
+<!-- ======================= -->
+
+<div class="sales-grid">
 
 <div class="panel">
 
 <h2>일 매출</h2>
 
 <form method="get">
-<input type="hidden" name="year" value="{{ year }}">
 
 <input type="date" name="start_date" value="{{ start_date }}">
 ~
 <input type="date" name="end_date" value="{{ end_date }}">
 
 <button type="submit">조회</button>
-</form>
 
+</form>
 
 <div class="table-scroll">
 
@@ -102,24 +126,39 @@
 
 </div>
 
-
 <div class="table-footer">
+
 <a class="download-btn"
 href="{{ url_for('export_sales_csv',
 seller_id=seller['seller_id'],
 start_date=start_date,
 end_date=end_date) }}">
+
 CSV 다운로드
+
 </a>
+
+</div>
+
+</div>
+
+
+
+<div class="chart-box">
+
+<canvas id="dailyChart"></canvas>
+
 </div>
 
 </div>
 
 
 
-<!-- ===================== -->
-<!-- 월 매출 -->
-<!-- ===================== -->
+<!-- ======================= -->
+<!-- 월 매출 + 그래프 -->
+<!-- ======================= -->
+
+<div class="sales-grid">
 
 <div class="panel">
 
@@ -128,17 +167,16 @@ CSV 다운로드
 <h2>월 매출</h2>
 
 <form method="get">
+
 <input type="hidden" name="start_date" value="{{ start_date }}">
 <input type="hidden" name="end_date" value="{{ end_date }}">
 
 <select name="year" onchange="this.form.submit()">
 
 {% for y in year_list %}
-
 <option value="{{ y }}" {% if y|string == year|string %}selected{% endif %}>
 {{ y }}년
 </option>
-
 {% endfor %}
 
 </select>
@@ -174,17 +212,43 @@ CSV 다운로드
 
 </div>
 
+
+<div class="table-footer">
+
+<a class="download-btn"
+href="{{ url_for('export_month_sales_csv',
+seller_id=seller['seller_id'],
+year=year) }}">
+
+CSV 다운로드
+
+</a>
+
+</div>
+
+</div>
+
+
+<div class="chart-box">
+
+<canvas id="monthlyChart"></canvas>
+
+</div>
+
 </div>
 
 
 
-<!-- ===================== -->
-<!-- 연 매출 -->
-<!-- ===================== -->
+<!-- ======================= -->
+<!-- 연 매출 + 그래프 -->
+<!-- ======================= -->
 
+<div class="sales-grid">
 <div class="panel">
-
+<div class="panel-header">
 <h2>연 매출</h2>
+</div>
+
 
 <div class="table-scroll">
 
@@ -212,11 +276,107 @@ CSV 다운로드
 
 </div>
 
+
+<div class="table-footer">
+
+<a class="download-btn"
+href="{{ url_for('export_year_sales_csv',
+seller_id=seller['seller_id']) }}">
+
+CSV 다운로드
+
+</a>
+
 </div>
+
+</div>
+
+
+<div class="chart-box">
+
+<canvas id="yearlyChart"></canvas>
+
+</div>
+
+</div>
+
 
 
 </main>
+
 </div>
+
+
+
+<script>
+
+const dailyLabels = {{ daily_labels | safe }};
+const dailyValues = {{ daily_values | safe }};
+
+const monthlyLabels = {{ monthly_labels | safe }};
+const monthlyValues = {{ monthly_values | safe }};
+
+const yearlyLabels = {{ yearly_labels | safe }};
+const yearlyValues = {{ yearly_values | safe }};
+
+
+
+new Chart(document.getElementById("dailyChart"),{
+
+type:"line",
+
+data:{
+labels:dailyLabels,
+datasets:[{
+data:dailyValues,
+borderColor:"#2f6bff",
+backgroundColor:"rgba(47,107,255,0.1)",
+fill:true,
+tension:0.4
+}]
+},
+
+options:{plugins:{legend:{display:false}}}
+
+});
+
+
+
+new Chart(document.getElementById("monthlyChart"),{
+
+type:"bar",
+
+data:{
+labels:monthlyLabels,
+datasets:[{
+data:monthlyValues,
+backgroundColor:"#2f6bff"
+}]
+},
+
+options:{plugins:{legend:{display:false}}}
+
+});
+
+
+
+new Chart(document.getElementById("yearlyChart"),{
+
+type:"bar",
+
+data:{
+labels:yearlyLabels,
+datasets:[{
+data:yearlyValues,
+backgroundColor:"#4CAF50"
+}]
+},
+
+options:{plugins:{legend:{display:false}}}
+
+});
+
+</script>
 
 </body>
 </html>
