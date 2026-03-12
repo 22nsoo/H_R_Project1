@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - H&R</title>
+    <style>
+        /* 기본 레이아웃 및 폰트 설정 */
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background: #fff;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* 두 번째 코드의 세련된 상단바(Topbar) 흡수 */
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .topbar a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            gap: 26px;
+        }
+
+        /* 메인 컨테이너 영역 */
+        .wrap {
+            width: 100%;
+            max-width: 400px;
+            padding: 50px 20px 80px;
+            box-sizing: border-box;
+        }
+
+        /* 첫 번째 코드의 박스 스타일과 두 번째 코드의 디테일 결합 */
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            text-decoration: none;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0 0 30px 0;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        /* 입력 폼 스타일 */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input,
+        .select,
+        .gender-box {
+            width: 100%;
+            height: 52px;
+            padding: 0 15px;
+            border: 1px solid #f2f2f2;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: #f9f9f9;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus,
+        .select:focus {
+            border-color: #800020;
+            background: #fff;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .row .input {
+            width: calc(50% - 5px);
+        }
+
+        /* 성별 선택 박스 */
+        .gender-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .gender-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 20px;
+        }
+
+        .gender-options label {
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        /* 라벨 스타일 (사이즈/선호핏 안내) */
+        .field-label {
+            font-size: 13px;
+            color: #800020;
+            font-weight: bold;
+            margin-bottom: -8px;
+            margin-left: 5px;
+        }
+
+        /* 버튼 스타일 통합 */
+        .btn-signup {
+            width: 100%;
+            height: 56px;
+            background: #800020;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 17px;
+            margin-top: 15px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-signup:hover {
+            opacity: 0.9;
+        }
+
+        .bottom-link {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .bottom-link a {
+            text-decoration: none;
+            color: #800020;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/login">로그인</a>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="logo-area">
+            <a href="/main" class="logo-text">H&R</a>
+        </div>
+
+        <h2>회원가입</h2>
+
+        <form action="/signup" method="POST">
+            <input type="text" name="user_id" class="input" placeholder="아이디" required>
+            <input type="password" name="user_pw" class="input" placeholder="비밀번호" required>
+            <input type="text" name="user_name" class="input" placeholder="이름" required>
+
+            <div class="gender-box">
+                <span class="gender-label">성별</span>
+                <div class="gender-options">
+                    <label><input type="radio" name="gender" value="남" checked style="accent-color: #800020;"> 남</label>
+                    <label><input type="radio" name="gender" value="여" style="accent-color: #800020;"> 여</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <input type="number" name="height" class="input" placeholder="키(cm)" required>
+                <input type="number" name="weight" class="input" placeholder="몸무게(kg)" required>
+            </div>
+
+            <div class="field-label">평소 사이즈</div>
+            <select name="size" class="select">
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+            </select>
+
+            <div class="field-label">선호하는 핏</div>
+            <select name="preferred_fit" class="select">
+                <option value="정핏">정핏</option>
+                <option value="세미오버핏" selected>세미오버핏</option>
+                <option value="오버핏">오버핏</option>
+                <option value="슬림핏">슬림핏</option>
+            </select>
+
+            <button type="submit" class="btn-signup">가입하기</button>
+        </form>
+
+        <div class="bottom-link">
+            이미 회원이신가요? <a href="/login">로그인</a>
+        </div>
+    </div>
+</body>
+
+</html>

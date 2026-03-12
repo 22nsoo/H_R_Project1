@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>주문 완료 - H&R</title>
+    <style>
+        /* 1. 기본 스타일 리셋 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', Arial, sans-serif;
+            background: #fff;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 2. 상단 바 (H&R 아이덴티티) */
+        .topbar {
+            width: 100%;
+            height: 48px;
+            background: #800020;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 84px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        /* 3. 레이아웃 컨테이너 */
+        .wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+            text-align: center;
+            flex: 1;
+            /* 푸터를 하단에 고정하기 위한 설정 */
+        }
+
+        .logo-main {
+            font-size: 58px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        /* 4. 주문 완료 박스 스타일 */
+        .complete-box {
+            border: 1px solid #ead6dc;
+            background: #faf7f8;
+            padding: 70px 30px;
+            border-radius: 4px;
+        }
+
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #800020;
+        }
+
+        .title {
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 14px;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .desc {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 34px;
+        }
+
+        /* 5. 버튼 영역 */
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            min-width: 200px;
+            height: 56px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #800020;
+            color: #fff;
+            border: 1px solid #800020;
+        }
+
+        .btn-primary:hover {
+            background: #600018;
+            border-color: #600018;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #800020;
+            border: 1px solid #800020;
+        }
+
+        .btn-outline:hover {
+            background: #faf7f8;
+        }
+
+        /* 6. 푸터 스타일 */
+        .site-footer {
+            background-color: #fff;
+            color: #000;
+            padding: 80px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 30px;
+            letter-spacing: -1.5px;
+            color: #800020;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 24px;
+            }
+
+            .logo-main {
+                font-size: 42px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .complete-box {
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/main">H&R</a>
+            <a href="#">BEST</a>
+            <a href="#">SALE</a>
+        </div>
+        <div class="topbar-right">
+            <a href="/main">홈</a>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <a href="/main" class="logo-main">H&amp;R</a>
+
+        <div class="complete-box">
+            <div class="icon">✓</div>
+            <div class="title">ORDER COMPLETE</div>
+            <div class="desc">
+                주문이 성공적으로 완료되었습니다.<br>
+                <strong>고객님의 소중한 상품을 곧 준비해 드릴게요!</strong><br>
+                H&amp;R을 이용해주셔서 감사합니다.
+            </div>
+
+            <div class="btn-row">
+                <a href="/main" class="btn btn-primary">메인으로 가기</a>
+                <a href="/cart" class="btn btn-outline">장바구니 확인</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-logo">
+            <a href="/main" style="text-decoration: none;">
+                <span class="logo-text">H<span style="font-style: italic;">&</span>R</span>
+            </a>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+            <p>Hyundai Rotem & AI Defense Industry Bootcamp Project</p>
+        </div>
+    </footer>
+</body>
+
+</html>
