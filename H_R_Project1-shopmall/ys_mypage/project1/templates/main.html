@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H&R SHOP</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            color: #111;
+            background-color: #fff;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .top-bar {
+            background-color: #800020;
+            color: #fff;
+            font-size: 13px;
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .top-bar-left,
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        header {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 40px 5% 30px;
+        }
+
+        .logo-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-box img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-box img:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            font-size: 50px;
+            font-weight: 900;
+            color: #800020;
+            letter-spacing: -2px;
+        }
+
+        .search-form {
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: stretch;
+            border: 2px solid #800020;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(128, 0, 32, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .search-input {
+            flex: 1;
+            height: 60px;
+            padding: 0 20px;
+            border: none;
+            font-size: 18px;
+            outline: none;
+        }
+
+        .camera-label {
+            width: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-left: 1px solid #eee;
+            font-size: 24px;
+            color: #888;
+        }
+
+        .search-btn {
+            width: 120px;
+            background: #800020;
+            color: #fff;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        nav {
+            background: #fff;
+            border-bottom: 1px solid #ececec;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            height: 55px;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-size: 17px;
+            font-weight: 700;
+            color: #800020;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-link.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 3px;
+            background: #800020;
+        }
+
+        .flash-wrap {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 5%;
+        }
+
+        .flash-box {
+            border: 1px solid #ead6dc;
+            background: #faf7f8;
+            color: #800020;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .container {
+            padding: 50px 5%;
+            min-height: 500px;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #222;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 40px 20px;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .img-box {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #f4f4f4;
+            border: 1px solid #eee;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .img-box img {
+            transform: scale(1.08);
+        }
+
+        .brand {
+            font-size: 13px;
+            font-weight: bold;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        .name {
+            font-size: 15px;
+            color: #333;
+            margin-top: 8px;
+            height: 45px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: 800;
+            color: #800020;
+            margin-top: 10px;
+        }
+
+        .site-footer {
+            background-color: #fff;
+            padding: 80px 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .footer-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .footer-links {
+            margin-top: 25px;
+        }
+
+        .footer-links a {
+            color: #800020;
+            font-size: 12px;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .top-bar {
+                padding: 10px 20px;
+                font-size: 11px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <a href="/main">H&R</a>
+            <span>BEST</span>
+            <span>SALE</span>
+        </div>
+        <div class="top-bar-right">
+            <a href="{{ url_for('cart_page') }}">
+                장바구니
+                {% if session.get('cart') %}
+                <span
+                    style="background: #fff; color: #800020; font-size: 10px; padding: 1px 5px; border-radius: 10px; margin-left: 3px;">
+                    {{ session.get('cart').values() | map(attribute='qty') | sum }}
+                </span>
+                {% endif %}
+            </a>
+            {% if session.get('user_name') %}
+            <a href="/mypage" style="margin-right: 15px;">마이페이지</a>
+            <span style="color: rgba(255,255,255,0.9);">{{ session.get('user_name') }}님</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">로그아웃</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">로그인</a>
+            <a href="{{ url_for('signup') }}">회원가입</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <header>
+        <div class="logo-box">
+            <a href="/main" class="logo-link">
+                <img src="{{ url_for('static', filename='images/hr.png') }}" alt="H&R Logo">
+            </a>
+        </div>
+
+        <form id="combined-search-form" action="/main" method="GET" enctype="multipart/form-data" class="search-form">
+            <div class="search-wrapper">
+                <input type="text" name="search" class="search-input" placeholder="브랜드 또는 상품명을 입력하세요"
+                    value="{{ request.args.get('search', '') }}">
+                <label for="image-upload" class="camera-label">📷</label>
+                <input type="file" id="image-upload" name="search_img" style="display:none;" accept="image/*"
+                    onchange="previewImage(this)">
+                <button type="submit" class="search-btn">검색</button>
+            </div>
+
+            <div id="image-preview-container"
+                style="display:none; position: absolute; top: 70px; right: 0; background: white; border: 1px solid #800020; padding: 15px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 220px; border-radius: 8px;">
+                <p style="font-size: 12px; margin-bottom: 10px; font-weight: bold; color:#800020;">이미지로 검색하시겠습니까?</p>
+                <img id="image-preview" src="#" style="width: 100%; border-radius: 4px; margin-bottom: 10px;">
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" onclick="submitImageSearch()"
+                        style="flex: 1; height: 35px; background: #800020; color: #fff; border: none; cursor: pointer; font-size: 12px; font-weight: bold;">검색</button>
+                    <button type="button" onclick="cancelImage()"
+                        style="flex: 1; height: 35px; background: #eee; border: none; cursor: pointer; font-size: 12px;">취소</button>
+                </div>
+            </div>
+        </form>
+
+        <form id="imageSearchForm" method="POST" action="/main" enctype="multipart/form-data" style="display:none;">
+        </form>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flash-wrap">
+        {% for message in messages %}
+        <div class="flash-box">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <nav>
+        <div class="nav-inner">
+            <a href="/main?cate=ALL" class="nav-link {{ 'active' if current_cate == 'ALL' else '' }}">전체</a>
+            <a href="/main?cate=TOP" class="nav-link {{ 'active' if current_cate == 'TOP' else '' }}">상의</a>
+            <a href="/main?cate=PANTS" class="nav-link {{ 'active' if current_cate == 'PANTS' else '' }}">하의</a>
+            <a href="/main?cate=OUTER" class="nav-link {{ 'active' if current_cate == 'OUTER' else '' }}">아우터</a>
+            <a href="/main?cate=SHOES" class="nav-link {{ 'active' if current_cate == 'SHOES' else '' }}">신발</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="result-title">{{ current_cate if current_cate != 'ALL' else '전체 상품' }}</div>
+
+        <div class="grid">
+            {% for p in items %}
+            <div class="card" onclick="location.href='/product/{{ p.id }}'">
+                <div class="img-box">
+                    {% if p.img %}
+                    <img src="{{ p.img }}" alt="{{ p.name }}">
+                    {% else %}
+                    <div
+                        style="display:flex; justify-content:center; align-items:center; height:100%; color:#ccc; font-weight:bold;">
+                        IMAGE
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="brand">{{ p.brand }}</div>
+                <div class="name">{{ p.name }}</div>
+                <div class="price">{{ "{:,}".format(p.price) }}원</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not items %}
+        <div style="text-align:center; padding:100px 0; color:#999;">
+            <p style="font-size: 40px;">😭</p>
+            <p>검색 결과가 없습니다.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer class="site-footer">
+        <div class="logo-box">
+            <span class="logo-text" style="font-size: 30px;">H&R</span>
+        </div>
+        <div class="footer-info">
+            <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
+            <p>Hyundai Rotem & AI Defense Industry Bootcamp Project</p>
+        </div>
+        <div class="footer-links">
+            <a href="/main">Home</a>
+            <a href="/cart">Cart</a>
+            <a href="https://github.com/22nsoo/H_R_Project1" target="_blank">Github</a>
+        </div>
+    </footer>
+
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("image-preview").src = e.target.result;
+                    document.getElementById("image-preview-container").style.display = "block";
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function submitImageSearch() {
+            const fileInput = document.getElementById("image-upload");
+            const imageForm = document.getElementById("imageSearchForm");
+
+            if (fileInput.files.length > 0) {
+                imageForm.innerHTML = "";
+                imageForm.appendChild(fileInput);
+                imageForm.submit();
+            }
+        }
+
+        function cancelImage() {
+            document.getElementById("image-upload").value = "";
+            document.getElementById("image-preview-container").style.display = "none";
+        }
+    </script>
+</body>
+
+</html>
