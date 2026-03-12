@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
 
-<body>
+<body class="cs-page">
 
 <div class="layout">
 
@@ -33,10 +33,7 @@
     선택 삭제
 ========================= -->
 <form method="post" action="{{ url_for('delete_cs') }}" onsubmit="return confirmDelete()">
-
-<button type="submit" class="delete-btn">
-삭제
-</button>
+<button type="submit" class="delete-btn">삭제</button></form>
 
 <!-- =========================
     상품 문의
@@ -80,9 +77,12 @@
 
 {% else %}
 
-<form method="post" action="{{ url_for('reply_cs', cs_id=q.cs_id) }}" class="reply-form">
-<textarea name="reply" placeholder="답변 입력" class="reply-box"></textarea>
-<button type="submit" class="reply-btn">답변 등록</button>
+<form method="post"
+      action="{{ url_for('reply_cs', cs_id=q.cs_id) }}"
+      class="reply-form"
+      onsubmit="return confirmReply()">
+    <textarea name="reply" placeholder="답변 입력" class="reply-box"></textarea>
+    <button type="submit" class="reply-btn">답변 등록</button>
 </form>
 
 {% endif %}
@@ -97,9 +97,11 @@
 {% elif q.cs_status == '처리중' %}
 <span>처리중</span>
 
-{% else %}
+{% elif q.cs_status == '처리완료' %}
 <span>완료</span>
 
+{% else %}
+<span>{{ q.cs_status }}</span>
 {% endif %}
 
 </td>
@@ -213,8 +215,6 @@ class="{% if p == page_r %}active{% endif %}">
 {% endfor %}
 </div>
 
-</form>
-
 {% else %}
 <p>교환 / 반품 요청이 없습니다.</p>
 {% endif %}
@@ -227,6 +227,10 @@ class="{% if p == page_r %}active{% endif %}">
 
 function confirmDelete(){
 return confirm("선택한 문의를 삭제하시겠습니까?");
+}
+
+function confirmReply(){
+return confirm("답변을 등록하시겠습니까?");
 }
 
 

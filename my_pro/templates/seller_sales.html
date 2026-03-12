@@ -10,7 +10,7 @@
 
 </head>
 
-<body>
+<body class="sales-page">
 
 <div class="layout">
 
@@ -90,13 +90,15 @@
 
 <h2>일 매출</h2>
 
-<form method="get">
+<form method="get" class="sales-inline-form">
 
-<input type="date" name="start_date" value="{{ start_date }}">
-~
-<input type="date" name="end_date" value="{{ end_date }}">
+    <input type="date" name="start_date" value="{{ start_date }}">
 
-<button type="submit">조회</button>
+    <span class="date-sep">~</span>
+
+    <input type="date" name="end_date" value="{{ end_date }}">
+
+    <button type="submit">조회</button>
 
 </form>
 

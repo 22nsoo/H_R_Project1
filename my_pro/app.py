@@ -1292,7 +1292,10 @@ def seller_cs(seller_id):
 @app.route("/seller/cs/reply/<int:cs_id>", methods=["POST"])
 def reply_cs(cs_id):
 
-    reply = request.form["reply"]
+    reply = request.form.get("reply","").strip()
+
+    if not reply:
+        return redirect(request.referrer)
 
     conn = get_connection()
     cursor = conn.cursor()
