@@ -11,12 +11,12 @@
         <aside class="sidebar">
             <div class="sidebar-title">판매자 메뉴</div>
             <ul class="menu">
-                <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
-                <li><a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">매출 관리</a></li>
-                <li class="active"><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
-                <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
-                <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
-                <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
+                <li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
+                <li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
+                <li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
+                <li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
+                <li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
             </ul>
         </aside>
 
@@ -36,7 +36,7 @@
 
                 <div class="top-actions">
                     <form method="get"
-                            action="{{ url_for('seller_products', seller_id=seller['seller_id']) }}"
+                            action="{{ url_for('seller_products') }}"
                             class="filter-bar">
 
                             <input type="text"
@@ -85,7 +85,7 @@
                 {% if products %}
                 <div class="bulk-toolbar">
                     <form method="post"
-                        action="{{ url_for('delete_selected_products', seller_id=seller['seller_id']) }}"
+                        action="{{ url_for('delete_selected_products') }}"
                         id="bulkDeleteForm"
                         class="bulk-inline-form">
 
@@ -103,7 +103,7 @@
 
                     <div class="bulk-right-actions">
                         <a class="action-btn register-btn"
-                        href="{{ url_for('add_product', seller_id=seller['seller_id']) }}">
+                        href="{{ url_for('add_product') }}">
                             상품 등록
                         </a>
                     </div>
@@ -117,7 +117,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -128,7 +127,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -139,7 +137,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -150,7 +147,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -165,7 +161,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -176,7 +171,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -187,7 +181,6 @@
 
                             <th>
                                 <a href="{{ url_for('seller_products',
-                                    seller_id=seller['seller_id'],
                                     page=1,
                                     keyword=keyword,
                                     status=status,
@@ -250,7 +243,6 @@
                 <div class="pagination">
                     {% if page > 1 %}
                         <a href="{{ url_for('seller_products',
-                            seller_id=seller['seller_id'],
                             page=page-1,
                             keyword=keyword,
                             status=status,
@@ -261,7 +253,6 @@
 
                     {% for pno in range(1, total_pages + 1) %}
                         <a href="{{ url_for('seller_products',
-                            seller_id=seller['seller_id'],
                             page=pno,
                             keyword=keyword,
                             status=status,
@@ -273,7 +264,6 @@
 
                     {% if page < total_pages %}
                         <a href="{{ url_for('seller_products',
-                            seller_id=seller['seller_id'],
                             page=page+1,
                             keyword=keyword,
                             status=status,

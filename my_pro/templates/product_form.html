@@ -11,11 +11,12 @@
         <aside class="sidebar">
             <div class="sidebar-title">판매자 메뉴</div>
             <ul class="menu">
-                <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
-                <li class="active"><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
-                <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
-                <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
-                <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
+                <li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
+                <li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
+                <li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
+                <li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
+                <li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
             </ul>
         </aside>
 
@@ -222,7 +223,7 @@
 
                     <div class="form-actions">
                         <button type="submit">{% if mode == 'add' %}등록하기{% else %}수정하기{% endif %}</button>
-                        <a class="action-btn secondary" href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">목록으로</a>
+                        <a class="action-btn secondary" href="{{ url_for('seller_products') }}">목록으로</a>
                     </div>
                 </form>
             </div>

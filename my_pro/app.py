@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, Response
+from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
 from db import get_connection
 import json
 import pymysql
@@ -64,22 +64,101 @@ def get_seller_or_none(cursor, seller_id: int):
     )
     return cursor.fetchone()
 
+def get_login_seller_id():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return None
+    return seller_id
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        login_id = request.form.get("login_id", "").strip()
+        password = request.form.get("password", "").strip()
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT account_id, role
+            FROM accounts
+            WHERE login_id = %s AND password = %s AND is_active = 1
+        """, (login_id, password))
+        account = cursor.fetchone()
+
+        if not account:
+            cursor.close()
+            conn.close()
+            flash("아이디 또는 비밀번호가 올바르지 않습니다.")
+            return render_template("login.html")
+
+        if account["role"] == "seller":
+            cursor.execute("""
+                SELECT seller_id
+                FROM sellers
+                WHERE account_id = %s
+            """, (account["account_id"],))
+            seller = cursor.fetchone()
+
+            if not seller:
+                flash("연결된 판매자 정보가 없습니다.")
+                return render_template("login.html")
+
+            session["seller_id"] = seller["seller_id"]
+            session["account_id"] = account["account_id"]
+            session["role"] = account["role"]
+
+            return redirect(url_for("seller_dashboard"))
+
+        elif account["role"] == "customer":
+            session["account_id"] = account["account_id"]
+            session["role"] = account["role"]
+
+            return redirect(url_for("customer_home"))   # 네 구매자 메인 라우트명으로 변경
+
+        elif account["role"] == "admin":
+            session["account_id"] = account["account_id"]
+            session["role"] = account["role"]
+
+            return redirect(url_for("admin_dashboard"))  # 관리자 페이지 있으면
+
+        cursor.execute("""
+            SELECT seller_id
+            FROM sellers
+            WHERE account_id = %s
+        """, (account["account_id"],))
+        seller = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not seller:
+            flash("연결된 판매자 정보가 없습니다.")
+            return render_template("login.html")
+
+        session["seller_id"] = seller["seller_id"]
+        session["account_id"] = account["account_id"]
+
+        return redirect(url_for("seller_dashboard"))
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
 @app.route("/")
 def home():
-    conn = get_connection()
-    cursor = conn.cursor()
+    if session.get("seller_id"):
+        return redirect(url_for("seller_dashboard"))
+    return redirect(url_for("login"))
 
-    cursor.execute("SELECT seller_id, seller_name FROM sellers ORDER BY seller_id ASC")
-    sellers = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    return render_template("home.html", sellers=sellers)
-
-
-@app.route("/seller/dashboard/<int:seller_id>")
-def seller_dashboard(seller_id):
+@app.route("/seller/dashboard")
+def seller_dashboard():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -250,8 +329,11 @@ def seller_dashboard(seller_id):
         monthly_values=json.dumps(monthly_values)
     )
 
-@app.route("/seller/products/<int:seller_id>")
-def seller_products(seller_id):
+@app.route("/seller/products")
+def seller_products():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -385,8 +467,11 @@ def seller_products(seller_id):
         sort=sort,
     )
 
-@app.route("/seller/product/add/<int:seller_id>", methods=["GET", "POST"])
-def add_product(seller_id):
+@app.route("/seller/product/add", methods=["GET", "POST"])
+def add_product():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -519,7 +604,7 @@ def add_product(seller_id):
         conn.close()
 
         flash("상품이 등록되었습니다.")
-        return redirect(url_for("seller_products", seller_id=seller_id))
+        return redirect(url_for("seller_products"))
 
     cursor.close()
     conn.close()
@@ -699,7 +784,7 @@ def edit_product(product_id):
         conn.close()
 
         flash("상품이 수정되었습니다.")
-        return redirect(url_for("seller_products", seller_id=seller_id))
+        return redirect(url_for("seller_products"))
 
     cursor.close()
     conn.close()
@@ -733,15 +818,18 @@ def delete_product(product_id):
     conn.close()
 
     flash("상품이 삭제되었습니다.")
-    return redirect(url_for("seller_products", seller_id=seller_id))
+    return redirect(url_for("seller_products"))
 
-@app.route("/seller/products/delete-selected/<int:seller_id>", methods=["POST"])
-def delete_selected_products(seller_id):
+@app.route("/seller/products/delete-selected", methods=["POST"])
+def delete_selected_products():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
     product_ids = request.form.getlist("product_ids")
 
     if not product_ids:
         flash("선택된 상품이 없습니다.")
-        return redirect(url_for("seller_products", seller_id=seller_id))
+        return redirect(url_for("seller_products"))
 
     filtered_ids = []
     for pid in product_ids:
@@ -752,7 +840,7 @@ def delete_selected_products(seller_id):
 
     if not filtered_ids:
         flash("삭제할 상품 정보가 올바르지 않습니다.")
-        return redirect(url_for("seller_products", seller_id=seller_id))
+        return redirect(url_for("seller_products"))
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -770,10 +858,13 @@ def delete_selected_products(seller_id):
     conn.close()
 
     flash("선택한 상품이 삭제되었습니다.")
-    return redirect(url_for("seller_products", seller_id=seller_id))
+    return redirect(url_for("seller_products"))
 
-@app.route("/seller/products/delete-all/<int:seller_id>", methods=["POST"])
-def delete_all_products(seller_id):
+@app.route("/seller/products/delete-all", methods=["POST"])
+def delete_all_products():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -787,7 +878,7 @@ def delete_all_products(seller_id):
     conn.close()
 
     flash("전체 상품이 삭제되었습니다.")
-    return redirect(url_for("seller_products", seller_id=seller_id))
+    return redirect(url_for("seller_products"))
 
 @app.route("/seller/product/stock/<int:product_id>", methods=["POST"])
 def update_product_stock(product_id):
@@ -825,19 +916,27 @@ def update_product_stock(product_id):
     conn.close()
 
     flash("재고가 수정되었습니다.")
-    return redirect(url_for("seller_dashboard", seller_id=seller_id))
+    return redirect(url_for("seller_dashboard"))
 
-@app.route("/seller/orders/<int:seller_id>")
-def seller_orders(seller_id):
-    keyword = request.args.get("keyword")
-    status = request.args.get("status")
-    sort = request.args.get("sort")
+@app.route("/seller/orders")
+def seller_orders():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
+
+    keyword = request.args.get("keyword", "").strip()
+    status = request.args.get("status", "전체")
+    sort = request.args.get("sort", "latest")
     type_filter = request.args.get("type")
+
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    if page < 1:
+        page = 1
 
     conn = get_connection()
     cursor = conn.cursor()
-    
-    # 판매자 조회
+
     cursor.execute(
         "SELECT seller_id, seller_name FROM sellers WHERE seller_id = %s",
         (seller_id,)
@@ -849,30 +948,53 @@ def seller_orders(seller_id):
         conn.close()
         return "판매자를 찾을 수 없습니다."
 
-    query = """
-    SELECT order_id, order_code, customer_name, customer_email,
-        customer_phone, address,
-        order_date, total_amount, order_status
+    where_sql = """
     FROM orders
     WHERE seller_id = %s
     """
-
     params = [seller_id]
-    # 배송 미처리 필터
-    if type_filter == "pending":
-        query += " AND order_status IN ('신규주문','배송준비중')"
 
-    # 주문번호 검색
+    if type_filter == "pending":
+        where_sql += " AND order_status IN ('신규주문','배송준비중')"
+
     if keyword:
-        query += " AND order_code LIKE %s"
+        where_sql += " AND order_code LIKE %s"
         params.append(f"%{keyword}%")
 
-    # 상태 필터
     if status and status != "전체":
-        query += " AND order_status = %s"
+        where_sql += " AND order_status = %s"
         params.append(status)
 
-    # 정렬
+    count_sql = f"""
+    SELECT COUNT(*) AS total_count
+    {where_sql}
+    """
+    cursor.execute(count_sql, params)
+    total_count = int(cursor.fetchone()["total_count"] or 0)
+
+    total_pages = (total_count + per_page - 1) // per_page
+    if total_pages == 0:
+        total_pages = 1
+
+    if page > total_pages:
+        page = total_pages
+
+    offset = (page - 1) * per_page
+
+    query = f"""
+    SELECT
+        order_id,
+        order_code,
+        customer_name,
+        customer_email,
+        customer_phone,
+        address,
+        order_date,
+        total_amount,
+        order_status
+    {where_sql}
+    """
+
     if sort == "price_desc":
         query += " ORDER BY total_amount DESC"
     elif sort == "price_asc":
@@ -880,7 +1002,10 @@ def seller_orders(seller_id):
     else:
         query += " ORDER BY order_date DESC"
 
-    cursor.execute(query, params)
+    query += " LIMIT %s OFFSET %s"
+
+    list_params = params + [per_page, offset]
+    cursor.execute(query, list_params)
     orders = cursor.fetchall()
 
     for order in orders:
@@ -892,11 +1017,18 @@ def seller_orders(seller_id):
     return render_template(
         "seller_orders.html",
         seller=seller,
-        orders=orders
+        orders=orders,
+        page=page,
+        per_page=per_page,
+        total_count=total_count,
+        total_pages=total_pages
     )
 
-@app.route("/seller/sales/<int:seller_id>")
-def seller_sales(seller_id):
+@app.route("/seller/sales")
+def seller_sales():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -1056,9 +1188,11 @@ def seller_sales(seller_id):
     
 
 # 일 매출 다운로드 CSV 추가
-@app.route("/seller/sales/export/<int:seller_id>")
-def export_sales_csv(seller_id):
-
+@app.route("/seller/sales/export")
+def export_sales_csv():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
 
@@ -1097,8 +1231,11 @@ def export_sales_csv(seller_id):
     )
 
 # 월 매출 CSV 다운로드
-@app.route("/seller/sales/export_month/<int:seller_id>")
-def export_month_sales_csv(seller_id):
+@app.route("/seller/sales/export_month")
+def export_month_sales_csv():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
 
     year = request.args.get("year")
 
@@ -1139,8 +1276,11 @@ def export_month_sales_csv(seller_id):
 
 
 # 연 매출 CSV 다운로드
-@app.route("/seller/sales/export_year/<int:seller_id>")
-def export_year_sales_csv(seller_id):
+@app.route("/seller/sales/export_year")
+def export_year_sales_csv():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -1178,8 +1318,11 @@ def export_year_sales_csv(seller_id):
 
 
 # 판매자 CS (문의 + 교환/환불 관리)
-@app.route("/seller/cs/<int:seller_id>")
-def seller_cs(seller_id):
+@app.route("/seller/cs")
+def seller_cs():
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
 
     page_q = request.args.get("page_q", 1, type=int)
     page_r = request.args.get("page_r", 1, type=int)
@@ -1367,12 +1510,17 @@ def update_order_status(order_id):
     conn.close()
 
     # flash("주문 상태가 변경되었습니다.")
-    return redirect(url_for("seller_orders", seller_id=seller_id))
+    return redirect(url_for("seller_orders"))
 
 
 # 삭제 
 @app.route("/seller/cs/delete", methods=["POST"])
 def delete_cs():
+    ids = request.form.getlist("delete_ids")
+    print("삭제할 ids:", ids)
+
+    if not ids:
+        return redirect(request.referrer)
 
     ids = request.form.getlist("delete_ids")
 

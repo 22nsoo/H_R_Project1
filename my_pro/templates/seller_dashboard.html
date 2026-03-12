@@ -12,12 +12,12 @@
         <aside class="sidebar">
             <div class="sidebar-title">판매자 메뉴</div>
             <ul class="menu">
-                <li class="active"><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
-                <li><a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">매출 관리</a></li>
-                <li><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
-                <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
-                <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
-                <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
+                <li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
+                <li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
+                <li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
+                <li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
+                <li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
             </ul>
         </aside>
 
@@ -28,8 +28,8 @@
                     <div class="seller-info"><strong>{{ seller["seller_name"] }}</strong> 님 반가워요!</div>
                 </div>
                 <div class="top-actions">
-                    <a class="action-btn" href="{{ url_for('add_product', seller_id=seller['seller_id']) }}">상품 등록</a>
-                    <a class="action-btn secondary" href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 전체보기</a>
+                    <a class="action-btn" href="{{ url_for('add_product') }}">상품 등록</a>
+                    <a class="action-btn secondary" href="{{ url_for('seller_orders') }}">주문 전체보기</a>
                 </div>
             </header>
 
@@ -44,25 +44,25 @@
             {% endwith %}
 
             <section class="card-grid">
-                <a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">
+                <a href="{{ url_for('seller_sales') }}">
                 <div class="stat-card">
                     <div class="stat-title">일매출</div>
                     <div class="stat-value">{{ "{:,}".format(today_sales) }}원</div>
                 </div>
                 </a>
-                <a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">
+                <a href="{{ url_for('seller_sales') }}">
                 <div class="stat-card">
                     <div class="stat-title">월매출</div>
                     <div class="stat-value">{{ "{:,}".format(month_sales) }}원</div>
                 </div>
                 </a>
-                <a href="{{ url_for('seller_orders', seller_id=seller['seller_id'], type='pending') }}" class="stat-card-link">
+                <a href="{{ url_for('seller_orders', type='pending') }}" class="stat-card-link">
                 <div class="stat-card">
                     <div class="stat-title">배송 미처리건</div>
                     <div class="stat-value">{{ pending_orders }}건</div>
                 </div>
                 </a>
-                <a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">
+                <a href="{{ url_for('seller_cs') }}">
                 <div class="stat-card">
                     <div class="stat-title">문의 및 교환/환불</div>
                     <div class="stat-value">{{ cs_count }}개</div>
@@ -107,7 +107,7 @@
                 <div class="panel">
                     <h2>
                         재고 부족 상품
-                        <a class="text-link" href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 전체보기</a>
+                        <a class="text-link" href="{{ url_for('seller_products') }}">상품 전체보기</a>
                     </h2>
 
                     {% if low_stock_products %}
@@ -147,7 +147,7 @@
                 <div class="panel">
                     <h2>
                         최근 주문 내역
-                        <a class="text-link" href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 전체보기</a>
+                        <a class="text-link" href="{{ url_for('seller_orders') }}">주문 전체보기</a>
                     </h2>
 
                     {% if recent_orders %}
