@@ -6,13 +6,12 @@
     <title>상품 관리</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
-<body>
+<body class="product-page product-list-page">
     <div class="layout">
         <aside class="sidebar">
             <div class="sidebar-title">판매자 메뉴</div>
             <ul class="menu">
                 <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
-                <li><a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">매출 관리</a></li>
                 <li class="active"><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
                 <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
                 <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
@@ -22,13 +21,46 @@
 
         <main class="main">
             <header class="topbar">
+
                 <div>
                     <h1>상품 관리</h1>
-                    <div class="seller-info"><strong>{{ seller["seller_name"] }}</strong> 판매자 상품 목록</div>
+                    <div class="seller-info">
+                        {{ seller["seller_name"] }} 판매자
+                        {% if seller["brand_name"] %}
+                            ({{ seller["brand_name"] }})
+                        {% endif %}
+                        상품 목록
+                    </div>
                 </div>
+
                 <div class="top-actions">
-                    <a class="action-btn" href="{{ url_for('add_product', seller_id=seller['seller_id']) }}">상품 등록</a>
+                    <form method="get"
+                            action="{{ url_for('seller_products', seller_id=seller['seller_id']) }}"
+                            class="filter-bar">
+
+                            <input type="text"
+                                name="keyword"
+                                value="{{ keyword }}"
+                                placeholder="상품명/상품코드 검색">
+
+                            <select name="status">
+                                <option value="전체" {% if status == '전체' %}selected{% endif %}>전체</option>
+                                <option value="판매중" {% if status == '판매중' %}selected{% endif %}>판매중</option>
+                                <option value="품절" {% if status == '품절' %}selected{% endif %}>품절</option>
+                                <option value="숨김" {% if status == '숨김' %}selected{% endif %}>숨김</option>
+                            </select>
+
+                            <select name="sort">
+                                <option value="latest" {% if sort == 'latest' %}selected{% endif %}>최신순</option>
+                                <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>가격 높은순</option>
+                                <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>가격 낮은순</option>
+                                <option value="stock_asc" {% if sort == 'stock_asc' %}selected{% endif %}>재고 적은순</option>
+                            </select>
+
+                            <button type="submit">검색</button>
+                        </form>
                 </div>
+
             </header>
 
             {% with messages = get_flashed_messages() %}
@@ -42,29 +74,154 @@
             {% endwith %}
 
             <div class="panel">
-                <h2>상품 목록</h2>
+                <div class="panel-head">
+                    <div>
+                        <h2>상품 목록</h2>
+                        <div class="list-summary">총 {{ total_count }}개 상품</div>
+                    </div>
+                </div>
 
                 {% if products %}
+                <div class="bulk-toolbar">
+                    <form method="post"
+                        action="{{ url_for('delete_selected_products', seller_id=seller['seller_id']) }}"
+                        id="bulkDeleteForm"
+                        class="bulk-inline-form">
+
+                        <label for="checkAll" class="toolbar-btn select-toggle">
+                            <input type="checkbox" id="checkAll">
+                            <span>전체 선택</span>
+                        </label>
+
+                        <button type="submit"
+                                class="toolbar-btn danger-fill"
+                                onclick="return confirmSelectedDelete();">
+                            삭제
+                        </button>
+                    </form>
+
+                    <div class="bulk-right-actions">
+                        <a class="action-btn register-btn"
+                        href="{{ url_for('add_product', seller_id=seller['seller_id']) }}">
+                            상품 등록
+                        </a>
+                    </div>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
+                            <th class="checkbox-col">선택</th>
                             <th>이미지</th>
-                            <th>상품명</th>
-                            <th>카테고리</th>
-                            <th>가격</th>
-                            <th>재고</th>
-                            <th>상태</th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='product_code_desc' if sort == 'product_code_asc' else 'product_code_asc') }}">
+                                    상품코드
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='brand_name_desc' if sort == 'brand_name_asc' else 'brand_name_asc') }}">
+                                    브랜드
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='product_name_desc' if sort == 'product_name_asc' else 'product_name_asc') }}">
+                                    상품명
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='category_desc' if sort == 'category_asc' else 'category_asc') }}">
+                                    카테고리
+                                </a>
+                            </th>
+
+                            <th>성별</th>
+                            <th>색상</th>
+                            <th>사이즈</th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='price_desc' if sort == 'price_asc' else 'price_asc') }}">
+                                    가격
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='stock_desc' if sort == 'stock_asc' else 'stock_asc') }}">
+                                    재고
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_products',
+                                    seller_id=seller['seller_id'],
+                                    page=1,
+                                    keyword=keyword,
+                                    status=status,
+                                    sort='status_desc' if sort == 'status_asc' else 'status_asc') }}">
+                                    상태
+                                </a>
+                            </th>
+
                             <th>관리</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for p in products %}
                         <tr>
-                            <td>
-                                <img class="table-thumb" src="{{ p['image_main1'] or 'https://via.placeholder.com/60' }}" alt="상품이미지">
+                            <td class="checkbox-col">
+                                <input type="checkbox"
+                                       name="product_ids"
+                                       value="{{ p['product_id'] }}"
+                                       class="row-check"
+                                       form="bulkDeleteForm">
                             </td>
-                            <td>{{ p["product_name"] }}</td>
-                            <td>{{ p["category"] }}</td>
+                            <td>
+                                <img class="table-thumb"
+                                     src="{{ p['image_main1'] or 'https://via.placeholder.com/60' }}"
+                                     alt="상품이미지">
+                            </td>
+                            <td>{{ p["product_code"] }}</td>
+                            <td>{{ p["brand_name"] }}</td>
+                            <td>
+                                <div class="product-name-cell">{{ p["product_name"] }}</div>
+                            </td>
+                            <td>{{ p["category1"] }} / {{ p["category2"] }}</td>
+                            <td>{{ p["gender"] }}</td>
+                            <td>{{ p["color"] or '-' }}</td>
+                            <td>{{ p["size"] or '-' }}</td>
                             <td>{{ "{:,}".format(p["price"]) }}원</td>
                             <td>{{ p["stock"] }}</td>
                             <td>
@@ -78,21 +235,94 @@
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="action-btn small" href="{{ url_for('edit_product', product_id=p['product_id']) }}">수정</a>
-                                    <form method="post" action="{{ url_for('delete_product', product_id=p['product_id']) }}" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                                        <button type="submit" class="danger-btn">삭제</button>
-                                    </form>
+                                    <a class="action-btn small table-btn edit-btn"
+                                       href="{{ url_for('edit_product', product_id=p['product_id']) }}">
+                                        수정
+                                    </a>
                                 </div>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+
+                <div class="pagination">
+                    {% if page > 1 %}
+                        <a href="{{ url_for('seller_products',
+                            seller_id=seller['seller_id'],
+                            page=page-1,
+                            keyword=keyword,
+                            status=status,
+                            sort=sort) }}">
+                            이전
+                        </a>
+                    {% endif %}
+
+                    {% for pno in range(1, total_pages + 1) %}
+                        <a href="{{ url_for('seller_products',
+                            seller_id=seller['seller_id'],
+                            page=pno,
+                            keyword=keyword,
+                            status=status,
+                            sort=sort) }}"
+                           class="{% if pno == page %}active{% endif %}">
+                            {{ pno }}
+                        </a>
+                    {% endfor %}
+
+                    {% if page < total_pages %}
+                        <a href="{{ url_for('seller_products',
+                            seller_id=seller['seller_id'],
+                            page=page+1,
+                            keyword=keyword,
+                            status=status,
+                            sort=sort) }}">
+                            다음
+                        </a>
+                    {% endif %}
+                </div>
+
                 {% else %}
                     <p>등록된 상품이 없습니다.</p>
                 {% endif %}
             </div>
         </main>
     </div>
+
+    <script>
+        const checkAll = document.getElementById("checkAll");
+        const rowChecks = document.querySelectorAll(".row-check");
+
+        if (checkAll) {
+            checkAll.addEventListener("change", function () {
+                const checked = this.checked;
+                rowChecks.forEach(cb => {
+                    cb.checked = checked;
+                });
+            });
+        }
+
+        rowChecks.forEach(cb => {
+            cb.addEventListener("change", function () {
+                const total = document.querySelectorAll(".row-check").length;
+                const checked = document.querySelectorAll(".row-check:checked").length;
+
+                if (checkAll) {
+                    checkAll.checked = (total === checked);
+                }
+            });
+        });
+
+        function confirmSelectedDelete() {
+            const checked = document.querySelectorAll(".row-check:checked").length;
+
+            if (checked === 0) {
+                alert("삭제할 상품을 선택하세요.");
+                return false;
+            }
+
+            return confirm(`선택한 상품 ${checked}개를 삭제하시겠습니까?`);
+        }
+    </script>
 </body>
 </html>

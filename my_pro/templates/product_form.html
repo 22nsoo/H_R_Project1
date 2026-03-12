@@ -6,23 +6,30 @@
     <title>{% if mode == 'add' %}상품 등록{% else %}상품 수정{% endif %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
-<body>
+<body class="product-page product-form-page">
     <div class="layout">
         <aside class="sidebar">
             <div class="sidebar-title">판매자 메뉴</div>
             <ul class="menu">
                 <li><a href="{{ url_for('seller_dashboard', seller_id=seller['seller_id']) }}">대시보드</a></li>
-                <li><a href="{{ url_for('seller_sales', seller_id=seller['seller_id']) }}">매출 관리</a></li>
                 <li class="active"><a href="{{ url_for('seller_products', seller_id=seller['seller_id']) }}">상품 관리</a></li>
                 <li><a href="{{ url_for('seller_orders', seller_id=seller['seller_id']) }}">주문 관리</a></li>
-                <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
                 <li><a href="{{ url_for('home') }}">판매자 선택</a></li>
+                <li><a href="{{ url_for('seller_cs', seller_id=seller['seller_id']) }}">문의 및 교환/환불</a></li>
             </ul>
         </aside>
 
         <main class="main">
             <header class="topbar">
-                <h1>{% if mode == 'add' %}상품 등록{% else %}상품 수정{% endif %}</h1>
+                <div>
+                    <h1>{% if mode == 'add' %}상품 등록{% else %}상품 수정{% endif %}</h1>
+                    <div class="seller-info">
+                        <strong>{{ seller["seller_name"] }}</strong>
+                        {% if seller["brand_name"] %}
+                            ({{ seller["brand_name"] }})
+                        {% endif %}
+                    </div>
+                </div>
             </header>
 
             {% with messages = get_flashed_messages() %}
@@ -36,7 +43,30 @@
             {% endwith %}
 
             <div class="form-card">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="form-grid two-col">
+                        <div class="form-row">
+                            <label for="product_code">상품코드</label>
+                            <input
+                                type="text"
+                                id="product_code"
+                                name="product_code"
+                                value="{{ product['product_code'] if product else '' }}"
+                                placeholder="예: P001"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-row">
+                            <label>브랜드</label>
+                            <input
+                                type="text"
+                                value="{{ seller['brand_name'] if seller['brand_name'] else '-' }}"
+                                readonly
+                            >
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <label for="product_name">상품명</label>
                         <input
@@ -44,63 +74,150 @@
                             id="product_name"
                             name="product_name"
                             value="{{ product['product_name'] if product else '' }}"
+                            placeholder="예: 나이키 써마 핏 트레이닝 팬츠"
                             required
                         >
                     </div>
 
-                    <div class="form-row">
-                        <label for="category">카테고리</label>
-                        <input
-                            type="text"
-                            id="category"
-                            name="category"
-                            value="{{ product['category'] if product else '' }}"
-                            placeholder="예: 팬츠, 쇼츠"
-                        >
+                    <div class="form-grid two-col">
+                        <div class="form-row">
+                            <label for="category1">대분류</label>
+                            <select id="category1" name="category1" required>
+                                <option value="">대분류 선택</option>
+                                <option value="상의" {% if product and product["category1"] == "상의" %}selected{% endif %}>상의</option>
+                                <option value="하의" {% if product and product["category1"] == "하의" %}selected{% endif %}>하의</option>
+                                <option value="아우터" {% if product and product["category1"] == "아우터" %}selected{% endif %}>아우터</option>
+                                <option value="신발" {% if product and product["category1"] == "신발" %}selected{% endif %}>신발</option>
+                                <option value="가방" {% if product and product["category1"] == "가방" %}selected{% endif %}>가방</option>
+                                <option value="잡화" {% if product and product["category1"] == "잡화" %}selected{% endif %}>잡화</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="category2">중분류</label>
+                            <select id="category2" name="category2" required>
+                                <option value="">중분류 선택</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid four-col">
+                        <div class="form-row">
+                            <label for="gender">성별</label>
+                            <select id="gender" name="gender" required>
+                                <option value="남성" {% if product and product["gender"] == "남성" %}selected{% endif %}>남성</option>
+                                <option value="여성" {% if product and product["gender"] == "여성" %}selected{% endif %}>여성</option>
+                                <option value="공용" {% if not product or product["gender"] == "공용" %}selected{% endif %}>공용</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="price">가격</label>
+                            <input
+                                type="number"
+                                id="price"
+                                name="price"
+                                min="0"
+                                value="{{ product['price'] if product else 0 }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-row">
+                            <label for="color">색상</label>
+                            <input
+                                type="text"
+                                id="color"
+                                name="color"
+                                value="{{ product['color'] if product else '' }}"
+                                placeholder="예: 블랙"
+                            >
+                        </div>
+
+                        <div class="form-row">
+                            <label for="size">사이즈</label>
+                            <input
+                                type="text"
+                                id="size"
+                                name="size"
+                                value="{{ product['size'] if product else '' }}"
+                                placeholder="예: S / M / 260 / FREE"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-grid two-col">
+                        <div class="form-row">
+                            <label for="stock">재고</label>
+                            <input
+                                type="number"
+                                id="stock"
+                                name="stock"
+                                min="0"
+                                value="{{ product['stock'] if product else 0 }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-row">
+                            <label for="status">상태</label>
+                            <select id="status" name="status" required>
+                                <option value="판매중" {% if product and product["status"] == "판매중" %}selected{% elif not product %}selected{% endif %}>판매중</option>
+                                <option value="품절" {% if product and product["status"] == "품절" %}selected{% endif %}>품절</option>
+                                <option value="숨김" {% if product and product["status"] == "숨김" %}selected{% endif %}>숨김</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-row">
-                        <label for="price">가격</label>
-                        <input
-                            type="number"
-                            id="price"
-                            name="price"
-                            min="0"
-                            value="{{ product['price'] if product else 0 }}"
-                            required
-                        >
+                        <label for="description">상품 설명</label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="8"
+                            placeholder="상품 설명을 입력하세요."
+                        >{{ product['description'] if product else '' }}</textarea>
                     </div>
 
-                    <div class="form-row">
-                        <label for="stock">재고</label>
-                        <input
-                            type="number"
-                            id="stock"
-                            name="stock"
-                            min="0"
-                            value="{{ product['stock'] if product else 0 }}"
-                            required
-                        >
-                    </div>
+                    <div class="upload-section">
+                        <h3>상품 이미지</h3>
+                        <div class="upload-guide">
+                            대표 이미지는 필수이고, 추가 이미지는 선택입니다.
+                        </div>
 
-                    <div class="form-row">
-                        <label for="status">상태</label>
-                        <select id="status" name="status">
-                            <option value="판매중" {% if product and product["status"] == "판매중" %}selected{% endif %}>판매중</option>
-                            <option value="품절" {% if product and product["status"] == "품절" %}selected{% endif %}>품절</option>
-                            <option value="숨김" {% if product and product["status"] == "숨김" %}selected{% endif %}>숨김</option>
-                        </select>
-                    </div>
+                        <div class="form-grid two-col">
+                            <div class="form-row">
+                                <label for="image_main1">대표 이미지 (image_main1) *</label>
+                                <input type="file" id="image_main1" name="image_main1" accept=".jpg,.jpeg,.png,.webp">
+                                {% if product and product["image_main1"] %}
+                                    <img src="{{ product['image_main1'] }}" alt="대표 이미지" class="preview-thumb">
+                                {% endif %}
+                            </div>
 
-                    <div class="form-row">
-                        <label for="image_url">이미지 URL</label>
-                        <input
-                            type="text"
-                            id="image_url"
-                            name="image_url"
-                            value="{{ product['image_url'] if product else '' }}"
-                            placeholder="https://..."
-                        >
+                            <div class="form-row">
+                                <label for="image_main2">추가 이미지 2 (image_main2)</label>
+                                <input type="file" id="image_main2" name="image_main2" accept=".jpg,.jpeg,.png,.webp">
+                                {% if product and product["image_main2"] %}
+                                    <img src="{{ product['image_main2'] }}" alt="추가 이미지 2" class="preview-thumb">
+                                {% endif %}
+                            </div>
+
+                            <div class="form-row">
+                                <label for="image_main3">추가 이미지 3 (image_main3)</label>
+                                <input type="file" id="image_main3" name="image_main3" accept=".jpg,.jpeg,.png,.webp">
+                                {% if product and product["image_main3"] %}
+                                    <img src="{{ product['image_main3'] }}" alt="추가 이미지 3" class="preview-thumb">
+                                {% endif %}
+                            </div>
+
+                            <div class="form-row">
+                                <label for="image_detail">상세 이미지 (image_detail)</label>
+                                <input type="file" id="image_detail" name="image_detail" accept=".jpg,.jpeg,.png,.webp">
+                                {% if product and product["image_detail"] %}
+                                    <img src="{{ product['image_detail'] }}" alt="상세 이미지" class="preview-thumb">
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-actions">
@@ -111,5 +228,44 @@
             </div>
         </main>
     </div>
+
+    <script>
+        const categoryMap = {
+            "상의": ["반팔티", "셔츠", "후드티", "맨투맨", "니트", "민소매"],
+            "하의": ["팬츠", "데님팬츠", "조거팬츠", "쇼츠", "스커트", "레깅스"],
+            "아우터": ["자켓", "코트", "패딩", "후드집업", "플리스집업", "가디건"],
+            "신발": ["스니커즈", "러닝화", "샌들", "부츠", "슬리퍼"],
+            "가방": ["백팩", "숄더백", "크로스백", "토트백", "미니백"],
+            "잡화": ["모자", "양말", "벨트", "머플러", "장갑", "지갑"]
+        };
+
+        const category1El = document.getElementById("category1");
+        const category2El = document.getElementById("category2");
+        const selectedCategory2 = "{{ product['category2'] if product and product['category2'] else '' }}";
+
+        function updateCategory2Options() {
+            const selectedCategory1 = category1El.value;
+            category2El.innerHTML = '<option value="">중분류 선택</option>';
+
+            if (!selectedCategory1 || !categoryMap[selectedCategory1]) {
+                return;
+            }
+
+            categoryMap[selectedCategory1].forEach(item => {
+                const option = document.createElement("option");
+                option.value = item;
+                option.textContent = item;
+
+                if (item === selectedCategory2) {
+                    option.selected = true;
+                }
+
+                category2El.appendChild(option);
+            });
+        }
+
+        category1El.addEventListener("change", updateCategory2Options);
+        window.addEventListener("DOMContentLoaded", updateCategory2Options);
+    </script>
 </body>
 </html>
