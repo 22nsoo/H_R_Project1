@@ -21,3 +21,19 @@ def get_product_connection():
         charset='utf8mb4',
         cursorclass=pymysql.cursors.DictCursor
     )
+
+def get_all_products():
+    # ... DB 연결 코드 ...
+    # AS를 사용하여 HTML에서 사용하는 변수명과 똑같이 맞춰줍니다.
+    sql = """
+    SELECT 
+        prod_id, 
+        prod_name, 
+        prod_price, 
+        prod_brand, 
+        prod_img, 
+        prod_category 
+    FROM products
+    """
+    cursor.execute(sql)
+    return cursor.fetchall() # dictionary=True 설정 필수

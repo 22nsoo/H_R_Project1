@@ -305,8 +305,10 @@
                 </span>
                 {% endif %}
             </a>
+            <a href="http://localhost:5001" target="_blank"
+                style="color: rgba(255,255,255,0.7); font-size: 12px;">관리자</a>
             {% if session.get('user_name') %}
-            <a href="/mypage" style="margin-right: 15px;">마이페이지</a>
+            <a href="{{ url_for('mypage') }}">마이페이지</a>
             <span style="color: rgba(255,255,255,0.9);">{{ session.get('user_name') }}님</span>
             <a href="{{ url_for('logout') }}" class="logout-btn">로그아웃</a>
             {% else %}
