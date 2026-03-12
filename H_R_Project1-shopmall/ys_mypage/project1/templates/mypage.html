@@ -55,6 +55,13 @@
             line-height: 1.8;
         }
 
+        .logout-btn {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
         .btn-edit {
             display: inline-block;
             margin-top: 15px;
@@ -104,8 +111,8 @@
             <a href="{{ url_for('main_page') }}">HOME</a>
         </div>
         <div class="top-bar-right">
-            <span>{{ session.user_name }}님 환영합니다</span>
-            <a href="{{ url_for('logout') }}">LOGOUT</a>
+            <span><b>{{ session.user_name }}님 환영합니다</b></span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">로그아웃</a>
         </div>
     </div>
 
