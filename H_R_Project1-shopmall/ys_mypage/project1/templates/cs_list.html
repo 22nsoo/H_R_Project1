@@ -111,34 +111,32 @@
 
     <div class="container"
         style="max-width: 1000px; margin: 60px auto; padding: 0 20px; font-family: 'Pretendard', sans-serif;">
-        <div
-            style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 2px solid #111; padding-bottom: 20px;">
-            <div>
-                <h2 style="color: #111; font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -1px;">문의 내역</h2>
-                <p style="color: #888; margin: 5px 0 0 0; font-size: 14px;">고객님이 남겨주신 문의와 답변을 확인하실 수 있습니다.</p>
-            </div>
-            <a href="/cs/create"
-                style="text-decoration: none; background: #800000; color: #fff; padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 600;">새
-                문의 작성</a>
+        <div style="margin-bottom: 30px; border-bottom: 2px solid #111; padding-bottom: 25px;">
+            <h2 style="color: #111; font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -1px;">문의 내역</h2>
+            <p style="color: #888; margin: 8px 0 0 0; font-size: 14px;">고객님이 남겨주신 문의와 답변을 확인하실 수 있습니다.</p>
         </div>
 
         <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background: #fcfcfc; border-bottom: 1px solid #eee;">
-                    <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">구분</th>
-                    <th style="padding: 15px; text-align: left; font-size: 13px; color: #666; font-weight: 600;">문의 내용
-                    </th>
-                    <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">작성일</th>
-                    <th style="padding: 15px; width: 100px; font-size: 13px; color: #666; font-weight: 600;">상태</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if cs_items %}
-                {% for item in cs_items %}
-                <tr style="border-bottom: 1px solid #f2f2f2; transition: all 0.2s;"
-                    onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='#fff'">
-                    <td style="padding: 20px; text-align: center;">
-                        <span style="
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #fcfcfc; border-bottom: 1px solid #eee;">
+                        <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">구분</th>
+                        <th style="padding: 15px; text-align: left; font-size: 13px; color: #666; font-weight: 600;">문의
+                            내용
+                        </th>
+                        <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">작성일
+                        </th>
+                        <th style="padding: 15px; width: 100px; font-size: 13px; color: #666; font-weight: 600;">상태</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if cs_items %}
+                    {% for item in cs_items %}
+                    <tr style="border-bottom: 1px solid #f2f2f2; transition: all 0.2s;"
+                        onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='#fff'">
+                        <td style="padding: 20px; text-align: center;">
+                            <span style="
                             display: inline-block; 
                             min-width: 65px; 
                             font-size: 11px; 
@@ -151,45 +149,45 @@
                             white-space: nowrap;
                             text-align: center;
                         ">
-                            {{ item.cs_type }}
-                        </span>
-                    </td>
+                                {{ item.cs_type }}
+                            </span>
+                        </td>
 
-                    <td style="padding: 20px;">
-                        <a href="/cs/detail/{{ item.cs_id }}" style="text-decoration: none; display: block;">
-                            <div style="font-size: 12px; color: #999; margin-bottom: 4px; font-weight: 500;">{{
-                                item.product_name }}</div>
-                            <div style="font-size: 15px; font-weight: 600; color: #333; line-height: 1.4;">{{
-                                item.cs_title
-                                }}</div>
-                        </a>
-                    </td>
+                        <td style="padding: 20px;">
+                            <a href="/cs/detail/{{ item.cs_id }}" style="text-decoration: none; display: block;">
+                                <div style="font-size: 12px; color: #999; margin-bottom: 4px; font-weight: 500;">{{
+                                    item.product_name }}</div>
+                                <div style="font-size: 15px; font-weight: 600; color: #333; line-height: 1.4;">{{
+                                    item.cs_title
+                                    }}</div>
+                            </a>
+                        </td>
 
-                    <td style="padding: 20px; text-align: center; color: #888; font-size: 14px;">
-                        {{ item.created_at.strftime('%Y.%m.%d') }}
-                    </td>
+                        <td style="padding: 20px; text-align: center; color: #888; font-size: 14px;">
+                            {{ item.created_at.strftime('%Y.%m.%d') }}
+                        </td>
 
-                    <td style="padding: 20px; text-align: center;">
-                        {% if item.cs_status == '처리완료' %}
-                        <span
-                            style="display: inline-block; min-width: 65px; padding: 6px 0; background: #333; color: #fff; font-size: 11px; font-weight: 700; border-radius: 20px;">답변완료</span>
-                        {% else %}
-                        <span
-                            style="display: inline-block; min-width: 65px; padding: 6px 0; background: #eee; color: #999; font-size: 11px; font-weight: 700; border-radius: 20px;">검토중</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="4" style="padding: 100px 0; text-align: center; color: #bbb; font-size: 15px;">
-                        <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
-                        문의하신 내역이 없습니다.
-                    </td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+                        <td style="padding: 20px; text-align: center;">
+                            {% if item.cs_status == '처리완료' %}
+                            <span
+                                style="display: inline-block; min-width: 65px; padding: 6px 0; background: #333; color: #fff; font-size: 11px; font-weight: 700; border-radius: 20px;">답변완료</span>
+                            {% else %}
+                            <span
+                                style="display: inline-block; min-width: 65px; padding: 6px 0; background: #eee; color: #999; font-size: 11px; font-weight: 700; border-radius: 20px;">검토중</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="padding: 100px 0; text-align: center; color: #bbb; font-size: 15px;">
+                            <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
+                            문의하신 내역이 없습니다.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
     </div>
 
     <footer class="site-footer">
