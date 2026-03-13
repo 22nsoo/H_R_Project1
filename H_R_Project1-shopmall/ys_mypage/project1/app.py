@@ -223,20 +223,98 @@ def main_page():
 
 @app.route("/product/<int:p_id>")
 def product_detail(p_id):
-    product = get_product_by_id(p_id)
-    if not product:
-        return "상품을 찾을 수 없습니다.", 404
+    conn = get_connection()
+    # DictCursor를 사용하여 p['price'] 처럼 키값으로 접근 (KeyError 방지)
+    cur = conn.cursor(dictionary=True) if hasattr(conn, 'cursor') and 'dictionary' in str(conn.cursor) else conn.cursor()
+    
+    try:
+        # 1. 상품 정보 조회 (html의 p. 변수들과 이름 일치시킴)
+        product_sql = """
+            SELECT 
+                product_id AS id, product_name AS name, price, description AS `desc`, 
+                brand_name AS brand, image_main1 AS img, size AS size_options 
+            FROM products 
+            WHERE product_id = %s
+        """
+        cur.execute(product_sql, (p_id,))
+        # dictionary=True가 안될 경우를 대비해 fetchone 결과 처리
+        row = cur.fetchone()
+        
+        if not row:
+            return "<script>alert('상품을 찾을 수 없습니다.'); history.back();</script>"
 
-    reviews = []
-    recommendation = None
+        # 데이터 매핑 (튜플일 경우와 딕셔너리일 경우 모두 대응)
+        if isinstance(row, dict):
+            product = row
+        else:
+            product = {
+                'id': row[0], 'name': row[1], 'price': row[2], 'desc': row[3],
+                'brand': row[4], 'img': row[5], 'size_options': row[6]
+            }
+        
+        # 가격 숫자 변환 (TypeError 방지)
+        product['price'] = int(product['price']) if product['price'] else 0
 
-    return render_template(
-        "detail.html",
-        p=product,
-        product=product,
-        reviews=reviews,
-        recommendation=recommendation,
-    )
+        # 2. 리뷰 데이터 조회 (u.username, u.height 등 detail.html의 review. 변수와 일치)
+        review_sql = """
+            SELECT 
+                u.username, r.created_at, r.purchased_size, r.rating, 
+                r.size_feel, u.height, u.weight, r.review_text
+            FROM reviews r
+            JOIN users u ON r.user_id = u.user_id
+            WHERE r.product_id = %s
+            ORDER BY r.created_at DESC
+        """
+        cur.execute(review_sql, (p_id,))
+        review_rows = cur.fetchall()
+        
+        reviews = []
+        for r in review_rows:
+            if isinstance(r, dict):
+                rev = r
+            else:
+                rev = {
+                    'username': r[0], 'created_at': r[1], 'purchased_size': r[2],
+                    'rating': r[3], 'size_feel': r[4], 'height': r[5], 'weight': r[6], 'review_text': r[7]
+                }
+            
+            if rev['created_at']:
+                rev['created_at'] = rev['created_at'].strftime('%Y-%m-%d')
+            reviews.append(rev)
+
+        # 3. 사이즈 추천 (로그인 세션 기반)
+        recommendation = None
+        user_id = session.get('user_id')
+        if user_id:
+            cur.execute("SELECT height, weight FROM users WHERE user_id = %s", (user_id,))
+            u_info = cur.fetchone()
+            # u_info 처리
+            u_h = u_info['height'] if isinstance(u_info, dict) else u_info[0] if u_info else None
+            u_w = u_info['weight'] if isinstance(u_info, dict) else u_info[1] if u_info else None
+            
+            if u_h and u_w:
+                rec_sql = """
+                    SELECT r.purchased_size, COUNT(*) as cnt
+                    FROM reviews r JOIN users u ON r.user_id = u.user_id
+                    WHERE r.product_id = %s AND u.height BETWEEN %s-3 AND %s+3 AND u.weight BETWEEN %s-3 AND %s+3
+                    GROUP BY r.purchased_size ORDER BY cnt DESC LIMIT 1
+                """
+                cur.execute(rec_sql, (p_id, u_h, u_h, u_w, u_w))
+                rec_row = cur.fetchone()
+                if rec_row:
+                    recommendation = {
+                        'recommended_size': rec_row['purchased_size'] if isinstance(rec_row, dict) else rec_row[0],
+                        'message': "고객님과 비슷한 체형의 사용자들이 가장 많이 선택한 사이즈입니다.",
+                        'match_count': rec_row['cnt'] if isinstance(rec_row, dict) else rec_row[1]
+                    }
+
+    except Exception as e:
+        print(f"Error detail: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
+    return render_template("detail.html", p=product, reviews=reviews, recommendation=recommendation)
 
 
 @app.route("/init-demo")
@@ -296,8 +374,42 @@ def review_create(product_id):
         flash("상품을 찾을 수 없습니다.")
         return redirect(url_for("main_page"))
 
-    flash("현재 리뷰 기능은 상품 DB 연동 구조 조정 중입니다.")
-    return redirect(url_for("product_detail", p_id=product_id))
+    if request.method == "GET":
+        return render_template("review_form.html", product=product)
+
+    if request.method == "POST":
+        # 1. 폼 데이터 가져오기 (HTML의 name 속성과 일치해야 함)
+        purchased_size = request.form.get("purchased_size")
+        size_feel = request.form.get("size_feel")
+        fit_feel = request.form.get("fit_feel")
+        rating = request.form.get("rating")
+        review_text = request.form.get("review_text")
+
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                # [수정 완료] DB 설계문(reviews 테이블)과 컬럼명을 완벽히 맞췄습니다.
+                sql = """
+                    INSERT INTO reviews (
+                        user_id, product_id, purchased_size, 
+                        size_feel, fit_feel, rating, review_text, created_at
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+                """
+                cur.execute(sql, (
+                    user_id, product_id, purchased_size, 
+                    size_feel, fit_feel, rating, review_text
+                ))
+            conn.commit()
+            flash("리뷰가 성공적으로 등록되었습니다!")
+        except Exception as e:
+            conn.rollback()
+            flash(f"리뷰 등록 중 오류 발생: {e}")
+            return redirect(url_for("review_create", product_id=product_id))
+        finally:
+            conn.close()
+
+        # 등록 후 상품 상세 페이지로 이동 (p_id 파라미터 확인)
+        return redirect(url_for("product_detail", p_id=product_id))
 
 
 @app.route("/add_cart/<int:p_id>")
@@ -405,7 +517,7 @@ def order_complete():
                         """
                         INSERT INTO orders
                         (order_code, seller_id, user_id, customer_name,
-                         customer_phone, address, total_amount, order_status)
+                        customer_phone, address, total_amount, order_status)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, '신규주문')
                         """,
                         (
@@ -459,7 +571,7 @@ def mypage():
             cursor.execute(
                 """
                 SELECT o.order_date, p.product_name AS name,
-                       oi.subtotal AS price, o.order_status AS status
+                    oi.subtotal AS price, o.order_status AS status
                 FROM orders o
                 JOIN order_items oi ON o.order_id = oi.order_id
                 JOIN products p ON oi.product_id = p.product_id
