@@ -1362,3 +1362,20 @@ tbody tr:hover td {
         width: 100%;
     }
 }
+
+.order-link {
+    color: #2f6bff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.order-link:hover {
+    text-decoration: underline;
+    color: #1e56d8;
+}
+
+.order-link:active {
+    opacity: 0.8;
+}

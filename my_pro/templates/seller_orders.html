@@ -88,21 +88,105 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>주문번호</th>
-                            <th>주문자</th>
-                            <th>이메일</th>
-                            <th>전화번호</th>
-                            <th>주소</th>
-                            <th>주문일</th>
-                            <th>금액</th>
-                            <th>상태</th>
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='order_code_desc' if request.args.get('sort') == 'order_code_asc' else 'order_code_asc',
+                                    type=request.args.get('type')) }}">
+                                    주문번호
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='customer_name_desc' if request.args.get('sort') == 'customer_name_asc' else 'customer_name_asc',
+                                    type=request.args.get('type')) }}">
+                                    주문자
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='customer_email_desc' if request.args.get('sort') == 'customer_email_asc' else 'customer_email_asc',
+                                    type=request.args.get('type')) }}">
+                                    이메일
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='customer_phone_desc' if request.args.get('sort') == 'customer_phone_asc' else 'customer_phone_asc',
+                                    type=request.args.get('type')) }}">
+                                    전화번호
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='address_desc' if request.args.get('sort') == 'address_asc' else 'address_asc',
+                                    type=request.args.get('type')) }}">
+                                    주소
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='order_date_asc' if request.args.get('sort') == 'order_date_desc' else 'order_date_desc',
+                                    type=request.args.get('type')) }}">
+                                    주문일
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='price_asc' if request.args.get('sort') == 'price_desc' else 'price_desc',
+                                    type=request.args.get('type')) }}">
+                                    금액
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='status_desc' if request.args.get('sort') == 'status_asc' else 'status_asc',
+                                    type=request.args.get('type')) }}">
+                                    상태
+                                </a>
+                            </th>
+
                             <th>변경</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for o in orders %}
                         <tr>
-                            <td>{{ o["order_code"] }}</td>
+                            <td>
+                                <a href="{{ url_for('seller_order_detail', order_id=o['order_id']) }}" class="order-link">
+                                    {{ o["order_code"] }}
+                                </a>
+                            </td>
                             <td>{{ o["customer_name"] }}</td>
                             <td>{{ o["customer_email"] }}</td>
                             <td>{{ o["customer_phone"] }}</td>

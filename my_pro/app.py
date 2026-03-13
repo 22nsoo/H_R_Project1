@@ -999,6 +999,54 @@ def seller_orders():
         query += " ORDER BY total_amount DESC"
     elif sort == "price_asc":
         query += " ORDER BY total_amount ASC"
+    elif sort == "order_code_asc":
+        query += " ORDER BY order_code ASC"
+    elif sort == "order_code_desc":
+        query += " ORDER BY order_code DESC"
+    elif sort == "customer_name_asc":
+        query += " ORDER BY customer_name ASC"
+    elif sort == "customer_name_desc":
+        query += " ORDER BY customer_name DESC"
+    elif sort == "customer_email_asc":
+        query += " ORDER BY customer_email ASC"
+    elif sort == "customer_email_desc":
+        query += " ORDER BY customer_email DESC"
+    elif sort == "customer_phone_asc":
+        query += " ORDER BY customer_phone ASC"
+    elif sort == "customer_phone_desc":
+        query += " ORDER BY customer_phone DESC"
+    elif sort == "address_asc":
+        query += " ORDER BY address ASC"
+    elif sort == "address_desc":
+        query += " ORDER BY address DESC"
+    elif sort == "order_date_asc":
+        query += " ORDER BY order_date ASC"
+    elif sort == "order_date_desc":
+        query += " ORDER BY order_date DESC"
+    elif sort == "status_asc":
+        query += """
+            ORDER BY CASE order_status
+                WHEN '신규주문' THEN 1
+                WHEN '배송준비중' THEN 2
+                WHEN '배송중' THEN 3
+                WHEN '배송완료' THEN 4
+                WHEN '반품요청' THEN 5
+                WHEN '교환요청' THEN 6
+                ELSE 99
+            END ASC
+        """
+    elif sort == "status_desc":
+        query += """
+            ORDER BY CASE order_status
+                WHEN '신규주문' THEN 1
+                WHEN '배송준비중' THEN 2
+                WHEN '배송중' THEN 3
+                WHEN '배송완료' THEN 4
+                WHEN '반품요청' THEN 5
+                WHEN '교환요청' THEN 6
+                ELSE 99
+            END DESC
+        """
     else:
         query += " ORDER BY order_date DESC"
 
@@ -1363,7 +1411,7 @@ def seller_cs():
         FROM customer_service cs
         JOIN products p ON cs.product_id = p.product_id
         WHERE cs.seller_id=%s
-        AND cs.cs_type='상품문의'
+        AND cs.cs_type IN ('교환요청','반품요청')
         ORDER BY
             CASE cs.cs_status
                 WHEN '접수' THEN 0
@@ -1397,7 +1445,7 @@ def seller_cs():
             o.order_code,
             p.product_name
         FROM customer_service cs
-        JOIN orders o ON cs.order_id = o.order_id
+        LEFT JOIN orders o ON cs.order_id = o.order_id
         JOIN products p ON cs.product_id = p.product_id
         WHERE cs.seller_id=%s
         AND cs.cs_type IN ('교환요청','반품요청')
@@ -1542,5 +1590,74 @@ def delete_cs():
     conn.close()
 
     return redirect(request.referrer)
+
+@app.route("/seller/orders/<int:order_id>")
+def seller_order_detail(order_id):
+    seller_id = session.get("seller_id")
+    if not seller_id:
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # 주문 기본 정보
+    cursor.execute("""
+        SELECT
+            o.order_id,
+            o.order_code,
+            o.customer_name,
+            o.customer_email,
+            o.customer_phone,
+            o.address,
+            o.order_date,
+            o.total_amount,
+            o.order_status
+        FROM orders o
+        WHERE o.order_id = %s
+        AND o.seller_id = %s
+    """, (order_id, seller_id))
+    order = cursor.fetchone()
+
+    if not order:
+        cursor.close()
+        conn.close()
+        return "해당 주문을 찾을 수 없습니다."
+
+    # 주문 상품 목록
+    cursor.execute("""
+        SELECT
+            oi.order_item_id,
+            oi.quantity,
+            oi.unit_price,
+            oi.subtotal,
+            oi.selected_size,
+            oi.selected_color,
+            p.product_name,
+            p.product_code,
+            p.image_main1
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE oi.order_id = %s
+        ORDER BY oi.order_item_id ASC
+    """, (order_id,))
+    order_items = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT seller_id, seller_name
+        FROM sellers
+        WHERE seller_id = %s
+    """, (seller_id,))
+    seller = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "seller_order_detail.html",
+        seller=seller,
+        order=order,
+        order_items=order_items
+    )
+
 if __name__ == "__main__":
     app.run(debug=True)
