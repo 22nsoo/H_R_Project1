@@ -1411,7 +1411,7 @@ def seller_cs():
         FROM customer_service cs
         JOIN products p ON cs.product_id = p.product_id
         WHERE cs.seller_id=%s
-        AND cs.cs_type IN ('교환요청','반품요청')
+        AND cs.cs_type='상품문의'
         ORDER BY
             CASE cs.cs_status
                 WHEN '접수' THEN 0
