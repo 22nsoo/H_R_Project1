@@ -4,143 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>마이페이지 - H&R SHOP</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Pretendard', sans-serif;
-            background-color: #fff;
-        }
-
-        .top-bar {
-            background-color: #800020;
-            color: #fff;
-            padding: 12px 5%;
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 60px auto;
-            padding: 40px;
-            border: 1px solid #eee;
-            border-radius: 12px;
-        }
-
-        h1 {
-            color: #800020;
-            font-size: 28px;
-            border-bottom: 2px solid #800020;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-        }
-
-        h2 {
-            font-size: 20px;
-            color: #333;
-            margin-top: 40px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-info {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            line-height: 1.8;
-        }
-
-        .logout-btn {
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 2px 8px;
-            font-size: 11px;
-            margin-left: 5px;
-        }
-
-        .btn-edit {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 16px;
-            background: #800020;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .btn-go-cart {
-            font-size: 13px;
-            color: #800020;
-            text-decoration: underline;
-        }
-
-        /* 깔끔한 CS 전용 링크 스타일 */
-        .link-cs {
-            margin-left: 10px;
-            font-size: 11px;
-            color: #999;
-            border: 1px solid #eee;
-            padding: 2px 6px;
-            border-radius: 2px;
-            font-weight: normal;
-            transition: all 0.2s;
-        }
-
-        .link-cs:hover {
-            color: #800020;
-            border-color: #800020;
-        }
-
-        .cs-history-banner {
-            margin-top: 30px;
-            padding: 15px;
-            background: #fafafa;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .cs-history-banner a {
-            font-size: 13px;
-            color: #666;
-            text-decoration: none;
-            letter-spacing: -0.5px;
-        }
-
-        .cs-history-banner a span {
-            color: #800020;
-            margin-left: 4px;
-            font-weight: bold;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
-        th {
-            background: #f4f4f4;
-            padding: 10px;
-            text-align: left;
-            border-top: 1px solid #ddd;
-        }
-
-        td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mypage.css') }}">
 </head>
 
 <body>
@@ -226,7 +90,7 @@
         </table>
 
         <div class="cs-history-banner">
-            <a href="/cs/list"><b>내 문의 내역 및 처리 상태 확인하기 </b><span>&gt;</span></a>
+            <a href="/cs/list">내 문의 내역 및 처리 상태 확인하기 <span>&gt;</span></a>
         </div>
     </div>
 </body>

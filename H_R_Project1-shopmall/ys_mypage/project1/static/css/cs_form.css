@@ -1,0 +1,77 @@
+.site-footer {
+    background-color: #fff;
+    padding: 80px 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.footer-info p {
+    font-size: 13px;
+    color: #666;
+    margin: 5px 0;
+}
+
+.footer-links {
+    margin-top: 25px;
+}
+
+.footer-links a {
+    color: #800020;
+    font-size: 12px;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+.logo-box img:hover {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 50px;
+    font-weight: 900;
+    color: #800020;
+    letter-spacing: -2px;
+}
+
+.top-bar {
+    background-color: #800020;
+    color: #fff;
+    font-size: 13px;
+    padding: 12px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.top-bar-left,
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logout-btn {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 2px 8px;
+    font-size: 11px;
+    margin-left: 5px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    color: #111;
+    background-color: #fff;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
