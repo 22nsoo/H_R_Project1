@@ -79,6 +79,44 @@
             text-decoration: underline;
         }
 
+        /* 깔끔한 CS 전용 링크 스타일 */
+        .link-cs {
+            margin-left: 10px;
+            font-size: 11px;
+            color: #999;
+            border: 1px solid #eee;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: normal;
+            transition: all 0.2s;
+        }
+
+        .link-cs:hover {
+            color: #800020;
+            border-color: #800020;
+        }
+
+        .cs-history-banner {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .cs-history-banner a {
+            font-size: 13px;
+            color: #666;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .cs-history-banner a span {
+            color: #800020;
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -175,6 +213,8 @@
                     <td style="text-align: right;">{{ "{:,}".format(order.price) }}원</td>
                     <td style="text-align: center;">
                         <span style="color: #800020; font-weight: bold;">{{ order.status }}</span>
+                        <a href="/cs/create?order_id={{ order.order_id }}&product_id={{ order.product_id }}"
+                            class="link-cs">문의/반품</a>
                     </td>
                 </tr>
                 {% else %}
@@ -184,6 +224,10 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <div class="cs-history-banner">
+            <a href="/cs/list">내 문의 내역 및 처리 상태 확인하기 <span>&gt;</span></a>
+        </div>
     </div>
 </body>
 

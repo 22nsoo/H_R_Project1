@@ -749,7 +749,99 @@ def edit_profile():
         conn.close()
 
     return render_template("edit_profile.html", user=user)
+# ... (기존 상단 import 및 유틸리티 함수 유지)
 
+# [추가된 CS 기능 1] 문의/교환/반품 작성
+@app.route("/cs/create", methods=["GET", "POST"])
+def cs_create():
+    # ... (로그인 체크 생략)
+    if request.method == "GET":
+        o_id = request.args.get("order_id")
+        p_id = request.args.get("product_id")
+        
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                # [핵심] image_main1을 반드시 'img'라는 이름으로 가져와야 HTML의 {{ product.img }}와 연결됩니다.
+                sql = """
+                    SELECT product_id, product_name, seller_id, image_main1 AS img 
+                    FROM products 
+                    WHERE product_id=%s
+                """
+                cur.execute(sql, (p_id,))
+                product = cur.fetchone()
+                
+                # 만약 DB 연결 설정이 DictCursor가 아니라서 product['img'] 접근이 안 된다면
+                # 아래처럼 딕셔너리로 강제 변환해서 넘겨주는 것이 안전합니다.
+                if product and not isinstance(product, dict):
+                    product = {
+                        'product_id': product[0],
+                        'product_name': product[1],
+                        'seller_id': product[2],
+                        'img': product[3]
+                    }
+        finally: conn.close()
+        return render_template("cs_form.html", o_id=o_id, p_id=p_id, product=product)
+
+    if request.method == "POST":
+        o_id = request.form.get("order_id")
+        p_id = request.form.get("product_id")
+        s_id = request.form.get("seller_id")
+        cs_type = request.form.get("cs_type")
+        title = request.form.get("cs_title")
+        content = request.form.get("cs_content")
+        
+        # order_id가 없으면(구매 전 문의) None(NULL)으로 처리
+        final_o_id = int(o_id) if o_id and o_id != 'None' and o_id != '0' else None
+
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                sql = """
+                    INSERT INTO customer_service (order_id, product_id, seller_id, customer_name, cs_type, cs_title, cs_content)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """
+                cur.execute(sql, (final_o_id, p_id, s_id, session.get("user_name"), cs_type, title, content))
+                conn.commit()
+        finally: conn.close()
+        return redirect(url_for("cs_list"))
+
+# [추가된 CS 기능 2] 내 문의 내역 목록
+@app.route("/cs/list")
+def cs_list():
+    user_id = session.get("user_id")
+    if not user_id: return redirect(url_for("login"))
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT cs.*, p.product_name 
+                FROM customer_service cs
+                JOIN products p ON cs.product_id = p.product_id
+                WHERE cs.customer_name = %s
+                ORDER BY cs.created_at DESC
+            """, (session.get("user_name"),))
+            cs_items = cur.fetchall()
+    finally: conn.close()
+    return render_template("cs_list.html", cs_items=cs_items)
+
+# [추가된 CS 기능 3] 문의 상세 보기
+@app.route("/cs/detail/<int:cs_id>")
+def cs_detail(cs_id):
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT cs.*, p.product_name 
+                FROM customer_service cs 
+                JOIN products p ON cs.product_id = p.product_id 
+                WHERE cs_id=%s
+            """, (cs_id,))
+            cs_data = cur.fetchone()
+    finally: conn.close()
+    return render_template("cs_detail.html", cs=cs_data)
+
+# ... (나머지 기존 라우트들 - mypage, product_detail 등 모두 유지)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

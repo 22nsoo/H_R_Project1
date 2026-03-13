@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>{{ p.name }} - H&R</title>
     <style>
+        /* ... (기존 스타일 유지) ... */
         * {
             box-sizing: border-box;
         }
@@ -22,6 +23,7 @@
             color: inherit;
         }
 
+        /* (상단바, 레이아웃 스타일 생략 - 기존과 동일) */
         .topbar {
             width: 100%;
             height: 48px;
@@ -120,6 +122,7 @@
             white-space: pre-wrap;
         }
 
+        /* (기존 추천 박스 및 버튼 스타일) */
         .recommend-box {
             background: #faf7f8;
             border: 1px solid #ead6dc;
@@ -150,9 +153,10 @@
         .btn-row {
             display: flex;
             gap: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 15px;
         }
 
+        /* 마진 살짝 조정 */
         .btn {
             flex: 1;
             height: 56px;
@@ -163,6 +167,7 @@
             font-weight: 800;
             border-radius: 4px;
             transition: 0.3s;
+            cursor: pointer;
         }
 
         .btn-primary {
@@ -176,26 +181,49 @@
             border: 1px solid #ddd;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .back-link {
-            color: #888;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .review-section {
-            margin-top: 80px;
-            border-top: 1px solid #eee;
-            padding-top: 50px;
-        }
-
-        .review-title {
-            font-size: 28px;
-            font-weight: 900;
+        /* 추가된 CS 링크 스타일 */
+        .sub-action-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
             margin-bottom: 30px;
+        }
+
+        .link-sub {
+            font-size: 13px;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .link-sub:hover {
+            text-decoration: underline;
+            color: #800020;
+        }
+
+        /* 리뷰/문의 탭 스타일 */
+        .section-tab-header {
+            display: flex;
+            gap: 40px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
+            margin-top: 80px;
+        }
+
+        .tab-item {
+            font-size: 24px;
+            font-weight: 900;
+            padding-bottom: 15px;
+            cursor: pointer;
+            color: #bbb;
+        }
+
+        .tab-item.active {
+            color: #111;
+            border-bottom: 3px solid #111;
+        }
+
+        .tab-item:hover {
+            color: #800020;
         }
 
         .review-card {
@@ -240,24 +268,6 @@
             color: #666;
             margin: 5px 0;
         }
-
-        @media (max-width: 1024px) {
-            .product-area {
-                flex-direction: column;
-            }
-
-            .img-box {
-                width: 100%;
-            }
-
-            .wrap {
-                padding: 40px 24px;
-            }
-
-            .topbar {
-                padding: 0 24px;
-            }
-        }
     </style>
 </head>
 
@@ -265,8 +275,6 @@
     <div class="topbar">
         <div class="topbar-left">
             <a href="/main">H&R</a>
-            <a href="#">BEST</a>
-            <a href="#">SALE</a>
         </div>
         <div class="topbar-right">
             <a href="/cart">장바구니</a>
@@ -306,26 +314,21 @@
                 <div class="recommend-box">
                     <div class="recommend-title">리뷰 기반 사이즈 추천</div>
                     {% if recommendation %}
-                        {% if recommendation.recommended_size %}
-                        <div class="recommend-main">추천 사이즈 : {{ recommendation.recommended_size }}</div>
-                        {% else %}
-                        <div class="recommend-main">데이터 분석 중</div>
-                        {% endif %}
-                        <div class="recommend-sub">
-                            {{ recommendation.message }}<br>
-                            {% if recommendation.match_count %}
-                            (비슷한 체형 리뷰 {{ recommendation.match_count }}건 분석 완료)
-                            {% endif %}
-                        </div>
+                    <div class="recommend-main">추천 사이즈 : {{ recommendation.recommended_size or '데이터 분석 중' }}</div>
+                    <div class="recommend-sub">
+                        {{ recommendation.message }}<br>
+                        {% if recommendation.match_count %}(비슷한 체형 리뷰 {{ recommendation.match_count }}건 분석 완료){% endif
+                        %}
+                    </div>
                     {% else %}
-                        <div class="recommend-sub">
-                            {% if session.get('user_id') %}
-                            충분한 리뷰 데이터가 쌓이면 내 체형에 맞는 사이즈를 추천해 드립니다.
-                            {% else %}
-                            <a href="/login" style="color:#800020; font-weight:bold; text-decoration:underline;">로그인</a> 하시면
-                            고객님 체형에 맞는 사이즈를 추천해 드립니다.
-                            {% endif %}
-                        </div>
+                    <div class="recommend-sub">
+                        {% if session.get('user_id') %}
+                        충분한 리뷰 데이터가 쌓이면 내 체형에 맞는 사이즈를 추천해 드립니다.
+                        {% else %}
+                        <a href="/login" style="color:#800020; font-weight:bold; text-decoration:underline;">로그인</a> 하시면
+                        고객님 체형에 맞는 추천을 드립니다.
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
 
@@ -334,59 +337,55 @@
                     <a href="{{ url_for('add_cart', p_id=p.id) }}" class="btn btn-outline">장바구니 담기</a>
                 </div>
 
+                <div class="sub-action-row">
+                    <a href="/main" class="link-sub">← 쇼핑 계속하기</a>
+                    <a href="/cs/create?product_id={{ p.id }}" class="link-sub"
+                        style="color: #800020; font-weight: bold;">상품 문의하기</a>
+                </div>
+
                 <div class="btn-row">
                     {% if session.get('user_id') and can_review %}
-                    <a href="{{ url_for('review_create', product_id=p.id) }}" class="btn btn-outline" style="width: 100%;">
-                        리뷰 작성하기
-                    </a>
-                    {% elif session.get('user_id') %}
-                    <div style="width:100%; padding:14px; border:1px solid #ddd; text-align:center; color:#666; font-size:14px;">
-                        해당 상품을 주문한 회원만 리뷰를 작성할 수 있습니다.
-                    </div>
-                    {% else %}
-                    <a href="{{ url_for('login') }}" class="btn btn-outline" style="width: 100%;">
-                        로그인 후 리뷰 작성 가능
-                    </a>
+                    <a href="{{ url_for('review_create', product_id=p.id) }}" class="btn btn-outline"
+                        style="width: 100%;">리뷰 작성하기</a>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <div class="review-section">
-            <div class="review-title">CUSTOMER REVIEWS</div>
+        <div class="section-tab-header">
+            <div class="tab-item active">CUSTOMER REVIEWS</div>
+            <div class="tab-item" onclick="location.href='/cs/list'">Q&A</div>
+        </div>
+
+        <div class="review-content">
             {% if reviews %}
-                {% for review in reviews %}
-                <div class="review-card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span style="font-weight:800;">{{ review.username }}</span>
-                        <span style="color:#999; font-size:12px;">{{ review.created_at }}</span>
-                    </div>
-                    <div style="margin-bottom:12px;">
-                        <span class="tag tag-red">구매 사이즈 {{ review.purchased_size }}</span>
-                        {% if review.rating %}<span class="tag">평점 {{ review.rating }}/5</span>{% endif %}
-                        {% if review.size_feel %}<span class="tag">{{ review.size_feel }}</span>{% endif %}
-                    </div>
-                    {% if review.height or review.weight %}
-                    <div style="font-size:13px; color:#888; margin-bottom:8px;">
-                        체형: {{ review.height }}cm / {{ review.weight }}kg
-                    </div>
-                    {% endif %}
-                    <div style="font-size:15px; color:#333;">{{ review.review_text }}</div>
+            {% for review in reviews %}
+            <div class="review-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-weight:800;">{{ review.username }}</span>
+                    <span style="color:#999; font-size:12px;">{{ review.created_at }}</span>
                 </div>
-                {% endfor %}
+                <div style="margin-bottom:12px;">
+                    <span class="tag tag-red">구매 사이즈 {{ review.purchased_size }}</span>
+                    {% if review.rating %}<span class="tag">평점 {{ review.rating }}/5</span>{% endif %}
+                    {% if review.size_feel %}<span class="tag">{{ review.size_feel }}</span>{% endif %}
+                </div>
+                {% if review.height or review.weight %}
+                <div style="font-size:13px; color:#888; margin-bottom:8px;">체형: {{ review.height }}cm / {{ review.weight
+                    }}kg</div>
+                {% endif %}
+                <div style="font-size:15px; color:#333;">{{ review.review_text }}</div>
+            </div>
+            {% endfor %}
             {% else %}
-                <div style="text-align:center; padding:50px; color:#999; border:1px solid #f5f5f5;">
-                    아직 등록된 리뷰가 없습니다. 첫 번째 주인공이 되어보세요!
-                </div>
+            <div style="text-align:center; padding:50px; color:#999; border:1px solid #f5f5f5;">아직 등록된 리뷰가 없습니다.</div>
             {% endif %}
         </div>
     </div>
 
     <footer class="site-footer">
         <div class="footer-logo">
-            <a href="/main">
-                <span class="logo-text">H<span style="font-style: italic;">&</span>R</span>
-            </a>
+            <a href="/main"><span class="logo-text">H<span style="font-style: italic;">&</span>R</span></a>
         </div>
         <div class="footer-info">
             <p>&copy; 2026 <strong>5TEAM Project</strong>. H&R HOLDINGS</p>
