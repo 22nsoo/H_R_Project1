@@ -494,65 +494,97 @@ def order_page(p_id=None):
     return render_template("order.html")
 
 
-@app.route("/order_complete", methods=["GET", "POST"])
+import time
+
+@app.route("/order_complete", methods=["POST"])
 def order_complete():
     user_id = session.get("user_id")
+    if not user_id:
+        return "<script>alert('로그인이 필요합니다.'); location.href='/login';</script>"
+
+    # 1. 데이터 수집 (장바구니 혹은 단일 상품 정보)
+    p_id = request.form.get("p_id")  # 상세페이지에서 보낸 단일 상품 ID
+    qty = request.form.get("qty", 1, type=int) # 단일 상품 수량
+    
     cart = session.get("cart", {})
 
-    if user_id and cart:
-        receiver = request.values.get("receiver", "")
-        phone = request.values.get("phone", "")
-        address1 = request.values.get("address1", "")
-        address2 = request.values.get("address2", "")
-        address = f"{address1} {address2}".strip()
+    # 장바구니도 비어있고, 바로구매 p_id도 없다면 중단
+    if not cart and not p_id:
+        return "<script>alert('주문할 상품 정보가 없습니다.'); location.href='/main';</script>"
 
-        conn = get_connection()
-        try:
-            with conn.cursor() as cursor:
-                for p_id_str, item in cart.items():
-                    product = get_product_by_id(int(p_id_str))
-                    seller_id = product["seller_id"] if product else None
+    # 2. 주문할 아이템 리스트 생성 (단일 상품이면 리스트에 하나만 담기)
+    items_to_order = []
+    if p_id:
+        product = get_product_by_id(int(p_id))
+        if product:
+            items_to_order.append({
+                'p_id': int(p_id),
+                'price': product['price'],
+                'qty': qty,
+                'seller_id': product.get('seller_id', 'admin')
+            })
+    else:
+        # 장바구니 전체 주문인 경우
+        for p_id_str, item in cart.items():
+            product = get_product_by_id(int(p_id_str))
+            items_to_order.append({
+                'p_id': int(p_id_str),
+                'price': item.get('price', 0),
+                'qty': item.get('qty', 1),
+                'seller_id': product.get('seller_id', 'admin') if product else 'admin'
+            })
 
-                    cursor.execute(
-                        """
-                        INSERT INTO orders
-                        (order_code, seller_id, user_id, customer_name,
-                        customer_phone, address, total_amount, order_status)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, '신규주문')
-                        """,
-                        (
-                            f"ORD-{user_id}-{p_id_str}-{int(time.time())}",
-                            seller_id,
-                            user_id,
-                            receiver,
-                            phone,
-                            address,
-                            item.get("price", 0) * item.get("qty", 1),
-                        ),
-                    )
-                    order_id = cursor.lastrowid
+    # 3. 배송 정보 수집
+    receiver = request.form.get("receiver", "").strip()
+    phone = request.form.get("phone", "").strip()
+    address1 = request.form.get("address1", "").strip()
+    address2 = request.form.get("address2", "").strip()
+    address = f"{address1} {address2}".strip()
 
-                    cursor.execute(
-                        """
-                        INSERT INTO order_items
-                        (order_id, product_id, quantity, unit_price, subtotal)
-                        VALUES (%s, %s, %s, %s, %s)
-                        """,
-                        (
-                            order_id,
-                            int(p_id_str),
-                            item.get("qty", 1),
-                            item.get("price", 0),
-                            item.get("price", 0) * item.get("qty", 1),
-                        ),
-                    )
+    # 4. DB 저장
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            for item in items_to_order:
+                order_code = f"ORD-{user_id}-{int(time.time())}-{item['p_id']}"
+                total_amount = int(item['price']) * int(item['qty'])
 
-                conn.commit()
-        finally:
-            conn.close()
+                # orders 테이블 INSERT
+                sql_order = """
+                    INSERT INTO orders
+                    (order_code, seller_id, user_id, customer_name,
+                     customer_phone, address, total_amount, order_status, order_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, '신규주문', NOW())
+                """
+                cursor.execute(sql_order, (
+                    order_code, item['seller_id'], user_id,
+                    receiver, phone, address, total_amount
+                ))
+                
+                order_id = cursor.lastrowid
 
-    session.pop("cart", None)
-    return render_template("complete.html")
+                # order_items 테이블 INSERT
+                sql_item = """
+                    INSERT INTO order_items
+                    (order_id, product_id, quantity, unit_price, subtotal)
+                    VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(sql_item, (
+                    order_id, item['p_id'], item['qty'], item['price'], total_amount
+                ))
+
+            conn.commit()
+            if not p_id: # 장바구니 주문이었을 때만 장바구니 비우기
+                session.pop("cart", None)
+            
+            return render_template("complete.html")
+
+    except Exception as e:
+        conn.rollback()
+        print(f"❌ 주문 에러: {e}")
+        return f"<script>alert('주문 실패: {e}'); history.back();</script>"
+    finally:
+        conn.close()
 
 
 @app.route("/mypage")

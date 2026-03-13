@@ -247,6 +247,10 @@
             <h2>ORDER / PAYMENT</h2>
 
             <form action="/order_complete" method="POST">
+                {% if p %}
+                <input type="hidden" name="p_id" value="{{ p.id }}">
+                <input type="hidden" name="qty" value="1">
+                {% endif %}
                 <div class="section-title">배송 정보</div>
                 <input type="text" name="receiver" class="input" placeholder="받는 분" required>
 
