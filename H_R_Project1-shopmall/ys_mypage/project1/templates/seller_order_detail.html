@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문 상세</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <style>
+        body.orders-page {
+            margin: 0;
+            background: var(--bg-app);
+            font-family: "Pretendard", sans-serif;
+            color: var(--text);
+        }
+
+        .detail-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
+        }
+
+        .detail-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .detail-title-box h1 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 800;
+            color: #1f2937;
+            letter-spacing: -0.4px;
+        }
+
+        .detail-sub {
+            margin-top: 8px;
+            font-size: 15px;
+            color: var(--muted);
+        }
+
+        .detail-sub strong {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            height: 42px;
+            padding: 0 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #eef2f7;
+            color: #1f2937;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .detail-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #1f2937;
+            letter-spacing: -0.2px;
+        }
+
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .summary-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-soft);
+            padding: 18px 20px;
+            min-height: 96px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 84px;
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1;
+            box-sizing: border-box;
+        }
+
+        .status-new {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-ready {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+
+        .status-shipping {
+            background: #ebf8ff;
+            color: #3182ce;
+        }
+
+        .status-done {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-return {
+            background: #fff5f5;
+            color: #c53030;
+        }
+
+        .status-exchange {
+            background: #faf5ff;
+            color: #805ad5;
+        }
+
+        .info-table,
+        .items-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border: 1px solid #d6dee8;
+            border-radius: 16px;
+            background: #fff;
+            table-layout: fixed;
+        }
+
+        .info-table th,
+        .info-table td,
+        .items-table th,
+        .items-table td {
+            padding: 18px 18px;
+            border-bottom: 1px solid #dfe6ee;
+            font-size: 15px;
+        }
+
+        .info-table tr:last-child th,
+        .info-table tr:last-child td,
+        .items-table tr:last-child th,
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .info-table th,
+        .items-table th {
+            background: #f5f8fc;
+            color: #5b6b80;
+            font-weight: 700;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .info-table td {
+            background: #fff;
+            color: #1f2937;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .info-table .label-col {
+            width: 14%;
+        }
+
+        .info-table .value-col {
+            width: 36%;
+        }
+
+        .items-table thead th {
+            text-align: center;
+        }
+
+        .items-table tbody td {
+            text-align: center;
+            vertical-align: middle;
+            background: #fff;
+        }
+
+        .items-table tbody tr:hover td {
+            background: #f8fbff;
+        }
+
+        .thumb-box {
+            width: 74px;
+            height: 74px;
+            margin: 0 auto;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #f3f4f6;
+            border: 1px solid #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-name {
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.45;
+        }
+
+        .option-text {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .price-text {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .total-text {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .empty-box {
+            padding: 36px 20px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed #cbd5e1;
+            border-radius: 16px;
+            background: #f8fbff;
+        }
+
+        @media (max-width: 960px) {
+            .summary-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-topbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .back-btn {
+                align-self: flex-end;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .detail-title-box h1 {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body class="orders-page">
+    <div class="detail-wrap">
+        <div class="detail-topbar">
+            <div class="detail-title-box">
+                <h1>주문 상세</h1>
+                <div class="detail-sub">주문번호: <strong>{{ order["order_code"] }}</strong></div>
+            </div>
+            <a href="{{ url_for('seller_orders') }}" class="back-btn">목록으로</a>
+        </div>
+
+        <div class="summary-strip">
+            <div class="summary-box">
+                <div class="summary-label">주문자</div>
+                <div class="summary-value">{{ order["customer_name"] }}</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">총 주문금액</div>
+                <div class="summary-value">{{ "{:,}".format(order["total_amount"]) }}원</div>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-label">주문 상태</div>
+                <div class="summary-value">
+                    {% if order["order_status"] == "신규주문" %}
+                        <span class="status-badge status-new">신규주문</span>
+                    {% elif order["order_status"] == "배송준비중" %}
+                        <span class="status-badge status-ready">배송준비중</span>
+                    {% elif order["order_status"] == "배송중" %}
+                        <span class="status-badge status-shipping">배송중</span>
+                    {% elif order["order_status"] == "배송완료" %}
+                        <span class="status-badge status-done">배송완료</span>
+                    {% elif order["order_status"] == "반품요청" %}
+                        <span class="status-badge status-return">반품요청</span>
+                    {% elif order["order_status"] == "교환요청" %}
+                        <span class="status-badge status-exchange">교환요청</span>
+                    {% else %}
+                        <span class="status-badge">{{ order["order_status"] }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h2 class="section-title">주문 정보</h2>
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <th class="label-col">주문자</th>
+                        <td class="value-col">{{ order["customer_name"] }}</td>
+                        <th class="label-col">연락처</th>
+                        <td class="value-col">{{ order["customer_phone"] }}</td>
+                    </tr>
+                    <tr>
+                        <th class="label-col">이메일</th>
+                        <td class="value-col">{{ order["customer_email"] if order["customer_email"] else "-" }}</td>
+                        <th class="label-col">주문일</th>
+                        <td class="value-col">{{ order["order_date"] }}</td>
+                    </tr>
+                    <tr>
+                        <th class="label-col">주소</th>
+                        <td colspan="3">{{ order["address"] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="detail-card">
+            <h2 class="section-title">주문 상품</h2>
+
+            {% if order_items %}
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width:12%;">이미지</th>
+                        <th style="width:12%;">상품코드</th>
+                        <th style="width:28%;">상품명</th>
+                        <th style="width:16%;">옵션</th>
+                        <th style="width:8%;">수량</th>
+                        <th style="width:12%;">단가</th>
+                        <th style="width:12%;">합계</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td>
+                            <div class="thumb-box">
+                                <img src="{{ item['image_main1'] }}" alt="상품이미지">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="price-text">{{ item["product_code"] }}</div>
+                        </td>
+                        <td style="text-align:left;">
+                            <div class="product-name">{{ item["product_name"] }}</div>
+                        </td>
+                        <td>
+                            <span class="option-text">
+                                {{ item["selected_size"] or "-" }} / {{ item["selected_color"] or "-" }}
+                            </span>
+                        </td>
+                        <td>{{ item["quantity"] }}</td>
+                        <td class="price-text">{{ "{:,}".format(item["unit_price"]) }}원</td>
+                        <td class="total-text">{{ "{:,}".format(item["subtotal"]) }}원</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-box">주문 상품 정보가 없습니다.</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

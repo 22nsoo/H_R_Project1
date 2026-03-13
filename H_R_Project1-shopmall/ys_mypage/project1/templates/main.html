@@ -48,6 +48,20 @@
             margin-left: 5px;
         }
 
+        .admin-btn {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            border-radius: 14px;
+            transition: 0.2s ease;
+        }
+
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
         header {
             background: #fff;
             border-bottom: 1px solid #eee;
@@ -305,8 +319,9 @@
                 </span>
                 {% endif %}
             </a>
-            <a href="http://localhost:5001" target="_blank"
-                style="color: rgba(255,255,255,0.7); font-size: 12px;">관리자</a>
+
+            <a href="{{ url_for('admin_login') }}" class="admin-btn">관리자 화면</a>
+
             {% if session.get('user_name') %}
             <a href="{{ url_for('mypage') }}">마이페이지</a>
             <span style="color: rgba(255,255,255,0.9);"><b>{{ session.get('user_name') }}님</b></span>

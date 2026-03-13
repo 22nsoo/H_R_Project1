@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>문의 및 교환/환불 관리</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+
+<body class="cs-page">
+
+<div class="layout">
+
+<!-- 사이드바 -->
+<aside class="sidebar">
+    <div class="sidebar-title">판매자 메뉴</div>
+    <ul class="menu">
+        <li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
+        <li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
+        <li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
+        <li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
+        <li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
+        <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
+    </ul>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+    <h1>문의 및 교환 / 환불 관리</h1>
+</header>
+
+<!-- =========================
+    선택 삭제
+========================= -->
+<form id="deleteCsForm" method="post" action="{{ url_for('delete_cs') }}" onsubmit="return confirmDelete()">
+    <button type="submit" class="delete-btn">삭제</button>
+</form>
+<!-- =========================
+    상품 문의
+========================= -->
+<div class="panel">
+
+<h2>상품 문의</h2>
+
+{% if questions %}
+<table>
+<thead>
+<tr>
+<th><input type="checkbox" id="checkAllQuestions"></th>
+<th>고객</th>
+<th>상품</th>
+<th>제목</th>
+<th>문의내용</th>
+<th>답변</th>
+<th>상태</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for q in questions %}
+<tr>
+
+<td>
+<input type="checkbox" name="delete_ids" value="{{ q.cs_id }}" class="question-check" form="deleteCsForm">
+</td>
+
+<td>{{ q.customer_name }}</td>
+<td>{{ q.product_name }}</td>
+<td>{{ q.cs_title }}</td>
+<td style="max-width:250px">{{ q.cs_content }}</td>
+
+<td>
+
+{% if q.cs_reply %}
+<div>{{ q.cs_reply }}</div>
+
+{% else %}
+
+<form method="post"
+      action="{{ url_for('reply_cs', cs_id=q.cs_id) }}"
+      class="reply-form"
+      onsubmit="return confirmReply()">
+    <textarea name="reply" placeholder="답변 입력" class="reply-box"></textarea>
+    <button type="submit" class="reply-btn">답변 등록</button>
+</form>
+
+{% endif %}
+
+</td>
+
+<td>
+
+{% if q.cs_status == '접수' %}
+<span>접수</span>
+
+{% elif q.cs_status == '처리중' %}
+<span>처리중</span>
+
+{% elif q.cs_status == '처리완료' %}
+<span>완료</span>
+
+{% else %}
+<span>{{ q.cs_status }}</span>
+{% endif %}
+
+</td>
+
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+<div class="pagination">
+{% for p in range(1, total_pages_q+1) %}
+<a href="?page_q={{p}}&page_r={{page_r}}"
+class="{% if p == page_q %}active{% endif %}">
+{{p}}
+</a>
+{% endfor %}
+</div>
+{% else %}
+<p>등록된 상품 문의가 없습니다.</p>
+{% endif %}
+</div>
+
+
+
+<!-- =========================
+교환 / 반품 요청
+========================= -->
+
+<div class="panel">
+<h2>교환 / 반품 요청</h2>
+
+{% if returns %}
+
+<table>
+<thead>
+<tr>
+<th><input type="checkbox" id="checkAllReturns"></th>
+<th>주문번호</th>
+<th>고객</th>
+<th>상품</th>
+<th>요청유형</th>
+<th>내용</th>
+<th>상태</th>
+<th>처리</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for r in returns %}
+<tr>
+
+<td>
+<input type="checkbox" name="delete_ids" value="{{ r.cs_id }}" class="return-check" form="deleteCsForm">
+</td>
+
+<td>{{ r.order_code }}</td>
+
+<td>{{ r.customer_name }}</td>
+
+<td>{{ r.product_name }}</td>
+
+<td>
+{% if r.cs_type == "교환요청" %}
+<span class="badge exchange">교환요청</span>
+{% else %}
+<span class="badge return">반품요청</span>
+{% endif %}
+</td>
+
+<td>{{ r.cs_content }}</td>
+
+<td>
+{% if r.cs_status == "접수" %}
+<span>접수</span>
+{% elif r.cs_status == "처리중" %}
+<span>처리중</span>
+{% else %}
+<span>완료</span>
+{% endif %}
+</td>
+
+<td>
+{% if r.cs_status == "처리완료" %}
+완료
+{% else %}
+<form method="post" action="{{ url_for('update_cs_status', cs_id=r.cs_id)}}" class="cs-form" >
+<select name="cs_status" class="cs-select">
+<option value="접수">접수</option>
+<option value="처리중">처리중</option>
+<option value="처리완료">처리완료</option>
+</select>
+<button type="submit" class="cs-btn">변경</button>
+</form>
+{% endif %}
+</td>
+
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+<div class="pagination">
+{% for p in range(1, total_pages_r+1) %}
+<a href="?page_q={{page_q}}&page_r={{p}}"
+class="{% if p == page_r %}active{% endif %}">
+{{p}}
+</a>
+{% endfor %}
+</div>
+
+{% else %}
+<p>교환 / 반품 요청이 없습니다.</p>
+{% endif %}
+</div>
+
+</main>
+</div>
+
+<script>
+
+function confirmDelete(){
+return confirm("선택한 문의를 삭제하시겠습니까?");
+}
+
+function confirmReply(){
+return confirm("답변을 등록하시겠습니까?");
+}
+
+
+// 상품 문의 전체 선택
+document.getElementById("checkAllQuestions").addEventListener("change", function(){
+
+let checks = document.querySelectorAll(".question-check");
+
+checks.forEach(c=>{
+c.checked = this.checked;
+});
+
+});
+
+
+// 교환 / 반품 전체 선택
+document.getElementById("checkAllReturns").addEventListener("change", function(){
+
+let checks = document.querySelectorAll(".return-check");
+
+checks.forEach(c=>{
+c.checked = this.checked;
+});
+
+});
+
+</script>
+</body>
+</html>

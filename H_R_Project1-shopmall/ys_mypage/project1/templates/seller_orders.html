@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문 관리</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body class="orders-page">
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-title">판매자 메뉴</div>
+            <ul class="menu">
+                <li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
+                <li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
+                <li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
+                <li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
+                <li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
+            </ul>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <h1>주문 관리</h1>
+                    <div class="seller-info"><strong>{{ seller["seller_name"] }}</strong> 판매자 주문 목록</div>
+                </div>
+                <div class="filter-bar">
+                <form method="get">
+                <input type="text" name="keyword" placeholder="주문번호 검색" value="{{ request.args.get('keyword','') }}">
+                <select name="status">
+                <option value="전체">전체</option>
+                <option value="신규주문">신규주문</option>
+                <option value="배송준비중">배송준비중</option>
+                <option value="배송중">배송중</option>
+                <option value="배송완료">배송완료</option>
+                <option value="반품요청">반품요청</option>
+                <option value="교환요청">교환요청</option>
+                </select>
+                <select name="sort">
+                <option value="latest">최신순</option>
+                <option value="price_desc">금액 높은순</option>
+                <option value="price_asc">금액 낮은순</option>
+                </select>
+                <button type="submit">검색</button>
+                </form>
+                </div>
+            </header>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-box">
+                        {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="panel">
+                <h2>
+                {% if request.args.get('type') == 'pending' %}
+                배송 미처리 주문 목록
+                {% elif request.args.get('keyword') %}
+                "{{ request.args.get('keyword') }}" 검색 결과
+                {% elif request.args.get('status') == '신규주문' %}
+                신규 주문 목록
+                {% elif request.args.get('status') == '배송준비중' %}
+                배송 준비중 주문 목록
+                {% elif request.args.get('status') == '배송중' %}
+                배송중 주문 목록
+                {% elif request.args.get('status') == '배송완료' %}
+                배송 완료 주문 목록
+                {% elif request.args.get('status') == '반품요청' %}
+                반품 요청 주문 목록
+                {% elif request.args.get('status') == '교환요청' %}
+                교환 요청 주문 목록
+                {% else %}
+                전체 주문 목록
+                {% endif %}
+                <span style="color:#888; font-size:13px;">
+                ({{ total_count }}건)
+                </span>
+                </h2>
+
+                {% if orders %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='order_code_desc' if request.args.get('sort') == 'order_code_asc' else 'order_code_asc',
+                                    type=request.args.get('type')) }}">
+                                    주문번호
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='customer_name_desc' if request.args.get('sort') == 'customer_name_asc' else 'customer_name_asc',
+                                    type=request.args.get('type')) }}">
+                                    주문자
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='customer_email_desc' if request.args.get('sort') == 'customer_email_asc' else 'customer_email_asc',
+                                    type=request.args.get('type')) }}">
+                                    이메일
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='customer_phone_desc' if request.args.get('sort') == 'customer_phone_asc' else 'customer_phone_asc',
+                                    type=request.args.get('type')) }}">
+                                    전화번호
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='address_desc' if request.args.get('sort') == 'address_asc' else 'address_asc',
+                                    type=request.args.get('type')) }}">
+                                    주소
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='order_date_asc' if request.args.get('sort') == 'order_date_desc' else 'order_date_desc',
+                                    type=request.args.get('type')) }}">
+                                    주문일
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='price_asc' if request.args.get('sort') == 'price_desc' else 'price_desc',
+                                    type=request.args.get('type')) }}">
+                                    금액
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="{{ url_for('seller_orders',
+                                    page=1,
+                                    keyword=request.args.get('keyword', ''),
+                                    status=request.args.get('status', '전체'),
+                                    sort='status_desc' if request.args.get('sort') == 'status_asc' else 'status_asc',
+                                    type=request.args.get('type')) }}">
+                                    상태
+                                </a>
+                            </th>
+
+                            <th>변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('seller_order_detail', order_id=o['order_id']) }}" class="order-link">
+                                    {{ o["order_code"] }}
+                                </a>
+                            </td>
+                            <td>{{ o["customer_name"] }}</td>
+                            <td>{{ o["customer_email"] }}</td>
+                            <td>{{ o["customer_phone"] }}</td>
+                            <td>{{ o["address"] }}</td>
+                            <td>{{ o["order_date"] }}</td>
+                            <td>{{ "{:,}".format(o["total_amount"]) }}원</td>
+                            <td>
+                                    {% if o["order_status"] == "신규주문" %}
+                                    <span class="badge new">{{ o["order_status"] }}</span>
+                                    {% elif o["order_status"] == "배송준비중" %}
+                                    <span class="badge ready">{{ o["order_status"] }}</span>
+                                    {% elif o["order_status"] == "배송중" %}
+                                    <span class="badge shipping">{{ o["order_status"] }}</span>
+                                    {% elif o["order_status"] == "배송완료" %}
+                                    <span class="badge done">{{ o["order_status"] }}</span>
+                                    {% elif o["order_status"] == "반품요청" %}
+                                    <span class="badge return">{{ o["order_status"] }}</span>
+                                    {% elif o["order_status"] == "교환요청" %}
+                                    <span class="badge exchange">{{ o["order_status"] }}</span>
+                                    {% endif %}
+                            </td>
+                            <td>
+                                <form method="post" action="{{ url_for('update_order_status', order_id=o['order_id']) }}" class="inline-form">
+                                    <select name="order_status">
+                                        <option value="신규주문">신규주문</option>
+                                        <option value="배송준비중">배송준비중</option>
+                                        <option value="배송중">배송중</option>
+                                        <option value="배송완료">배송완료</option>
+                                        <option value="반품요청">반품요청</option>
+                                        <option value="교환요청">교환요청</option>
+                                    </select>
+                                    <button type="submit">변경</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    {% for p in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('seller_orders',
+                        page=p,
+                        keyword=request.args.get('keyword', ''),
+                        status=request.args.get('status', '전체'),
+                        sort=request.args.get('sort', 'latest'),
+                        type=request.args.get('type')) }}"
+                       class="{% if p == page %}active{% endif %}">
+                        {{ p }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                {% else %}
+                    <p>주문 내역이 없습니다.</p>
+                {% endif %}
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>
