@@ -59,6 +59,41 @@ def get_product_by_id(product_id):
         conn.close()
 
 
+def has_purchased_product(user_id, product_id):
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            sql = """
+                SELECT 1
+                FROM orders o
+                JOIN order_items oi ON o.order_id = oi.order_id
+                WHERE o.user_id = %s
+                  AND oi.product_id = %s
+                LIMIT 1
+            """
+            cur.execute(sql, (user_id, product_id))
+            return cur.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def has_existing_review(user_id, product_id):
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            sql = """
+                SELECT 1
+                FROM reviews
+                WHERE user_id = %s
+                  AND product_id = %s
+                LIMIT 1
+            """
+            cur.execute(sql, (user_id, product_id))
+            return cur.fetchone() is not None
+    finally:
+        conn.close()
+
+
 def match_products_from_image_results(image_results, items):
     item_map = {item["id"]: item for item in items if item.get("id") is not None}
     matched = []
@@ -230,125 +265,117 @@ def main_page():
 @app.route("/product/<int:p_id>")
 def product_detail(p_id):
     conn = get_connection()
-    cur = conn.cursor(dictionary=True) if hasattr(conn, "cursor") and "dictionary" in str(conn.cursor) else conn.cursor()
-
-    product = None
-    reviews = []
-    recommendation = None
-
     try:
-        product_sql = """
-            SELECT
-                product_id AS id,
-                product_name AS name,
-                price,
-                description AS `desc`,
-                brand_name AS brand,
-                image_main1 AS img,
-                size AS size_options
-            FROM products
-            WHERE product_id = %s
-        """
-        cur.execute(product_sql, (p_id,))
-        row = cur.fetchone()
+        with conn.cursor() as cur:
+            product_sql = """
+                SELECT
+                    product_id AS id,
+                    product_name AS name,
+                    price,
+                    description AS `desc`,
+                    brand_name AS brand,
+                    image_main1 AS img,
+                    size AS size_options
+                FROM products
+                WHERE product_id = %s
+            """
+            cur.execute(product_sql, (p_id,))
+            row = cur.fetchone()
 
-        if not row:
-            return "<script>alert('상품을 찾을 수 없습니다.'); history.back();</script>"
+            if not row:
+                return "<script>alert('상품을 찾을 수 없습니다.'); history.back();</script>"
 
-        if isinstance(row, dict):
-            product = row
-        else:
             product = {
-                "id": row[0],
-                "name": row[1],
-                "price": row[2],
-                "desc": row[3],
-                "brand": row[4],
-                "img": row[5],
-                "size_options": row[6],
+                "id": row.get("id"),
+                "name": row.get("name"),
+                "price": int(row.get("price") or 0),
+                "desc": row.get("desc") or "",
+                "brand": row.get("brand") or "",
+                "img": row.get("img") or "",
+                "size_options": row.get("size_options") or "",
             }
 
-        product["price"] = int(product["price"]) if product["price"] else 0
+            review_sql = """
+                SELECT
+                    u.username,
+                    r.created_at,
+                    r.purchased_size,
+                    r.rating,
+                    r.size_feel,
+                    u.height,
+                    u.weight,
+                    r.review_text
+                FROM reviews r
+                JOIN users u ON r.user_id = u.user_id
+                WHERE r.product_id = %s
+                ORDER BY r.created_at DESC
+            """
+            cur.execute(review_sql, (p_id,))
+            review_rows = cur.fetchall()
 
-        review_sql = """
-            SELECT
-                u.username,
-                r.created_at,
-                r.purchased_size,
-                r.rating,
-                r.size_feel,
-                u.height,
-                u.weight,
-                r.review_text
-            FROM reviews r
-            JOIN users u ON r.user_id = u.user_id
-            WHERE r.product_id = %s
-            ORDER BY r.created_at DESC
-        """
-        cur.execute(review_sql, (p_id,))
-        review_rows = cur.fetchall()
-
-        for r in review_rows:
-            if isinstance(r, dict):
-                rev = r
-            else:
+            reviews = []
+            for r in review_rows:
                 rev = {
-                    "username": r[0],
-                    "created_at": r[1],
-                    "purchased_size": r[2],
-                    "rating": r[3],
-                    "size_feel": r[4],
-                    "height": r[5],
-                    "weight": r[6],
-                    "review_text": r[7],
+                    "username": r.get("username"),
+                    "created_at": r.get("created_at").strftime("%Y-%m-%d") if r.get("created_at") else "",
+                    "purchased_size": r.get("purchased_size"),
+                    "rating": r.get("rating"),
+                    "size_feel": r.get("size_feel"),
+                    "height": r.get("height"),
+                    "weight": r.get("weight"),
+                    "review_text": r.get("review_text"),
                 }
+                reviews.append(rev)
 
-            if rev["created_at"]:
-                rev["created_at"] = rev["created_at"].strftime("%Y-%m-%d")
-            reviews.append(rev)
+            recommendation = None
+            can_review = False
 
-        user_id = session.get("user_id")
-        if user_id:
-            cur.execute("SELECT height, weight FROM users WHERE user_id = %s", (user_id,))
-            u_info = cur.fetchone()
+            user_id = session.get("user_id")
+            if user_id:
+                can_review = has_purchased_product(user_id, p_id)
 
-            if u_info:
-                if isinstance(u_info, dict):
+                cur.execute("SELECT height, weight FROM users WHERE user_id = %s", (user_id,))
+                u_info = cur.fetchone()
+
+                if u_info:
                     u_h = u_info.get("height")
                     u_w = u_info.get("weight")
-                else:
-                    u_h = u_info[0]
-                    u_w = u_info[1]
 
-                if u_h and u_w:
-                    rec_sql = """
-                        SELECT r.purchased_size, COUNT(*) as cnt
-                        FROM reviews r
-                        JOIN users u ON r.user_id = u.user_id
-                        WHERE r.product_id = %s
-                          AND u.height BETWEEN %s-3 AND %s+3
-                          AND u.weight BETWEEN %s-3 AND %s+3
-                        GROUP BY r.purchased_size
-                        ORDER BY cnt DESC
-                        LIMIT 1
-                    """
-                    cur.execute(rec_sql, (p_id, u_h, u_h, u_w, u_w))
-                    rec_row = cur.fetchone()
+                    if u_h and u_w:
+                        rec_sql = """
+                            SELECT r.purchased_size, COUNT(*) as cnt
+                            FROM reviews r
+                            JOIN users u ON r.user_id = u.user_id
+                            WHERE r.product_id = %s
+                              AND u.height BETWEEN %s-3 AND %s+3
+                              AND u.weight BETWEEN %s-3 AND %s+3
+                            GROUP BY r.purchased_size
+                            ORDER BY cnt DESC
+                            LIMIT 1
+                        """
+                        cur.execute(rec_sql, (p_id, u_h, u_h, u_w, u_w))
+                        rec_row = cur.fetchone()
 
-                    if rec_row:
-                        recommendation = {
-                            "recommended_size": rec_row["purchased_size"] if isinstance(rec_row, dict) else rec_row[0],
-                            "message": "고객님과 비슷한 체형의 사용자들이 가장 많이 선택한 사이즈입니다.",
-                            "match_count": rec_row["cnt"] if isinstance(rec_row, dict) else rec_row[1],
-                        }
+                        if rec_row:
+                            recommendation = {
+                                "recommended_size": rec_row.get("purchased_size"),
+                                "message": "고객님과 비슷한 체형의 사용자들이 가장 많이 선택한 사이즈입니다.",
+                                "match_count": rec_row.get("cnt"),
+                            }
+
+        return render_template(
+            "detail.html",
+            p=product,
+            reviews=reviews,
+            recommendation=recommendation,
+            can_review=can_review
+        )
 
     except Exception as e:
         print(f"Error detail: {e}")
+        return "<script>alert('상품 상세 조회 중 오류가 발생했습니다.'); history.back();</script>"
     finally:
-        cur.close()
         conn.close()
-
-    return render_template("detail.html", p=product, reviews=reviews, recommendation=recommendation)
 
 
 @app.route("/init-demo")
@@ -406,6 +433,14 @@ def review_create(product_id):
     if not product:
         flash("상품을 찾을 수 없습니다.")
         return redirect(url_for("main_page"))
+
+    if not has_purchased_product(user_id, product_id):
+        flash("이 상품을 주문한 회원만 리뷰를 작성할 수 있습니다.")
+        return redirect(url_for("product_detail", p_id=product_id))
+
+    if has_existing_review(user_id, product_id):
+        flash("이미 이 상품에 리뷰를 작성하셨습니다.")
+        return redirect(url_for("product_detail", p_id=product_id))
 
     if request.method == "GET":
         return render_template("review_form.html", product=product)

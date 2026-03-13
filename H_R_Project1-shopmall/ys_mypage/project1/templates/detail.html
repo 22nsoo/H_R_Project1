@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>{{ p.name }} - H&R</title>
     <style>
-        /* 기본 레이아웃 설정 */
         * {
             box-sizing: border-box;
         }
@@ -23,7 +22,6 @@
             color: inherit;
         }
 
-        /* 상단 바 */
         .topbar {
             width: 100%;
             height: 48px;
@@ -50,7 +48,6 @@
             font-size: 12px;
         }
 
-        /* 메인 컨텐츠 영역 */
         .wrap {
             max-width: 1200px;
             margin: 0 auto;
@@ -66,7 +63,6 @@
             display: block;
         }
 
-        /* 상품 정보 레이아웃 */
         .product-area {
             display: flex;
             gap: 60px;
@@ -124,7 +120,6 @@
             white-space: pre-wrap;
         }
 
-        /* 사이즈 추천 박스 */
         .recommend-box {
             background: #faf7f8;
             border: 1px solid #ead6dc;
@@ -152,7 +147,6 @@
             color: #666;
         }
 
-        /* 버튼 스타일 */
         .btn-row {
             display: flex;
             gap: 12px;
@@ -192,7 +186,6 @@
             font-weight: 600;
         }
 
-        /* 리뷰 섹션 */
         .review-section {
             margin-top: 80px;
             border-top: 1px solid #eee;
@@ -226,7 +219,6 @@
             border: 1px solid #ead6dc;
         }
 
-        /* 푸터 스타일 */
         .site-footer {
             background-color: #fff;
             color: #000;
@@ -314,26 +306,26 @@
                 <div class="recommend-box">
                     <div class="recommend-title">리뷰 기반 사이즈 추천</div>
                     {% if recommendation %}
-                    {% if recommendation.recommended_size %}
-                    <div class="recommend-main">추천 사이즈 : {{ recommendation.recommended_size }}</div>
-                    {% else %}
-                    <div class="recommend-main">데이터 분석 중</div>
-                    {% endif %}
-                    <div class="recommend-sub">
-                        {{ recommendation.message }}<br>
-                        {% if recommendation.match_count %}
-                        (비슷한 체형 리뷰 {{ recommendation.match_count }}건 분석 완료)
-                        {% endif %}
-                    </div>
-                    {% else %}
-                    <div class="recommend-sub">
-                        {% if session.get('user_id') %}
-                        충분한 리뷰 데이터가 쌓이면 내 체형에 맞는 사이즈를 추천해 드립니다.
+                        {% if recommendation.recommended_size %}
+                        <div class="recommend-main">추천 사이즈 : {{ recommendation.recommended_size }}</div>
                         {% else %}
-                        <a href="/login" style="color:#800020; font-weight:bold; text-decoration:underline;">로그인</a> 하시면
-                        고객님 체형에 맞는 사이즈를 추천해 드립니다.
+                        <div class="recommend-main">데이터 분석 중</div>
                         {% endif %}
-                    </div>
+                        <div class="recommend-sub">
+                            {{ recommendation.message }}<br>
+                            {% if recommendation.match_count %}
+                            (비슷한 체형 리뷰 {{ recommendation.match_count }}건 분석 완료)
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="recommend-sub">
+                            {% if session.get('user_id') %}
+                            충분한 리뷰 데이터가 쌓이면 내 체형에 맞는 사이즈를 추천해 드립니다.
+                            {% else %}
+                            <a href="/login" style="color:#800020; font-weight:bold; text-decoration:underline;">로그인</a> 하시면
+                            고객님 체형에 맞는 사이즈를 추천해 드립니다.
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
 
@@ -343,42 +335,49 @@
                 </div>
 
                 <div class="btn-row">
-                    {% if session.get('user_id') %}
-                    <a href="{{ url_for('review_create', product_id=p.id) }}" class="btn btn-outline"
-                        style="width: 100%;">리뷰 작성하기</a>
+                    {% if session.get('user_id') and can_review %}
+                    <a href="{{ url_for('review_create', product_id=p.id) }}" class="btn btn-outline" style="width: 100%;">
+                        리뷰 작성하기
+                    </a>
+                    {% elif session.get('user_id') %}
+                    <div style="width:100%; padding:14px; border:1px solid #ddd; text-align:center; color:#666; font-size:14px;">
+                        해당 상품을 주문한 회원만 리뷰를 작성할 수 있습니다.
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline" style="width: 100%;">
+                        로그인 후 리뷰 작성 가능
+                    </a>
                     {% endif %}
                 </div>
-
-                <a href="/main" class="back-link">← 메인으로 돌아가기</a>
             </div>
         </div>
 
         <div class="review-section">
             <div class="review-title">CUSTOMER REVIEWS</div>
             {% if reviews %}
-            {% for review in reviews %}
-            <div class="review-card">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="font-weight:800;">{{ review.username }}</span>
-                    <span style="color:#999; font-size:12px;">{{ review.created_at }}</span>
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span style="font-weight:800;">{{ review.username }}</span>
+                        <span style="color:#999; font-size:12px;">{{ review.created_at }}</span>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <span class="tag tag-red">구매 사이즈 {{ review.purchased_size }}</span>
+                        {% if review.rating %}<span class="tag">평점 {{ review.rating }}/5</span>{% endif %}
+                        {% if review.size_feel %}<span class="tag">{{ review.size_feel }}</span>{% endif %}
+                    </div>
+                    {% if review.height or review.weight %}
+                    <div style="font-size:13px; color:#888; margin-bottom:8px;">
+                        체형: {{ review.height }}cm / {{ review.weight }}kg
+                    </div>
+                    {% endif %}
+                    <div style="font-size:15px; color:#333;">{{ review.review_text }}</div>
                 </div>
-                <div style="margin-bottom:12px;">
-                    <span class="tag tag-red">구매 사이즈 {{ review.purchased_size }}</span>
-                    {% if review.rating %}<span class="tag">평점 {{ review.rating }}/5</span>{% endif %}
-                    {% if review.size_feel %}<span class="tag">{{ review.size_feel }}</span>{% endif %}
-                </div>
-                {% if review.height or review.weight %}
-                <div style="font-size:13px; color:#888; margin-bottom:8px;">
-                    체형: {{ review.height }}cm / {{ review.weight }}kg
-                </div>
-                {% endif %}
-                <div style="font-size:15px; color:#333;">{{ review.review_text }}</div>
-            </div>
-            {% endfor %}
+                {% endfor %}
             {% else %}
-            <div style="text-align:center; padding:50px; color:#999; border:1px solid #f5f5f5;">
-                아직 등록된 리뷰가 없습니다. 첫 번째 주인공이 되어보세요!
-            </div>
+                <div style="text-align:center; padding:50px; color:#999; border:1px solid #f5f5f5;">
+                    아직 등록된 리뷰가 없습니다. 첫 번째 주인공이 되어보세요!
+                </div>
             {% endif %}
         </div>
     </div>
