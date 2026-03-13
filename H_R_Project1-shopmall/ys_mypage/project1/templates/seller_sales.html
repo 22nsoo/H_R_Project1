@@ -1,383 +1,382 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<title>매출 관리</title>
+    <meta charset="UTF-8">
+    <title>매출 관리</title>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
 <body class="sales-page">
 
-<div class="layout">
+    <div class="layout">
 
-<!-- ======================= -->
-<!-- 사이드바 -->
-<!-- ======================= -->
+        <!-- ======================= -->
+        <!-- 사이드바 -->
+        <!-- ======================= -->
 
-<aside class="sidebar">
+        <aside class="sidebar">
 
-<div class="sidebar-title">판매자 메뉴</div>
+            <div class="sidebar-title">판매자 메뉴</div>
 
-<ul class="menu">
+            <ul class="menu">
 
-<li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
-<li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
-<li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
-<li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
-<li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
-<li><a href="{{ url_for('logout') }}">로그아웃</a></li>
-
-
-</ul>
-
-</aside>
+                <li><a href="{{ url_for('seller_dashboard') }}">대시보드</a></li>
+                <li><a href="{{ url_for('seller_sales') }}">매출 관리</a></li>
+                <li><a href="{{ url_for('seller_products') }}">상품 관리</a></li>
+                <li><a href="{{ url_for('seller_orders') }}">주문 관리</a></li>
+                <li><a href="{{ url_for('seller_cs') }}">문의 및 교환/환불</a></li>
+                <li><a href="{{ url_for('logout') }}">로그아웃</a></li>
 
 
+            </ul>
 
-<main class="main">
-
-<!-- ======================= -->
-<!-- 상단 -->
-<!-- ======================= -->
-
-<header class="topbar">
-
-<h1>매출 관리</h1>
-
-<div class="seller-info">
-<strong>{{ seller["seller_name"] }}</strong> 매출 관리
-</div>
-
-</header>
+        </aside>
 
 
 
-<!-- ======================= -->
-<!-- 요약 카드 -->
-<!-- ======================= -->
+        <main class="main">
 
-<section class="summary-cards">
+            <!-- ======================= -->
+            <!-- 상단 -->
+            <!-- ======================= -->
 
-<div class="summary-card">
-<div class="summary-title">총 매출</div>
-<div class="summary-value">{{ "{:,}".format(total_sales) }}원</div>
-</div>
+            <header class="topbar">
 
-<div class="summary-card">
-<div class="summary-title">총 주문</div>
-<div class="summary-value">{{ total_orders }}건</div>
-</div>
+                <h1>매출 관리</h1>
 
-<div class="summary-card">
-<div class="summary-title">평균 주문금액</div>
-<div class="summary-value">{{ "{:,}".format(avg_order) }}원</div>
-</div>
+                <div class="seller-info">
+                    <strong>{{ seller["seller_name"] }}</strong> 매출 관리
+                </div>
 
-</section>
+            </header>
 
 
 
-<!-- ======================= -->
-<!-- 일 매출 + 그래프 -->
-<!-- ======================= -->
+            <!-- ======================= -->
+            <!-- 요약 카드 -->
+            <!-- ======================= -->
 
-<div class="sales-grid">
+            <section class="summary-cards">
 
-<div class="panel">
+                <div class="summary-card">
+                    <div class="summary-title">총 매출</div>
+                    <div class="summary-value">{{ "{:,}".format(total_sales) }}원</div>
+                </div>
 
-<h2>일 매출</h2>
+                <div class="summary-card">
+                    <div class="summary-title">총 주문</div>
+                    <div class="summary-value">{{ total_orders }}건</div>
+                </div>
 
-<form method="get" class="sales-inline-form">
+                <div class="summary-card">
+                    <div class="summary-title">평균 주문금액</div>
+                    <div class="summary-value">{{ "{:,}".format(avg_order) }}원</div>
+                </div>
 
-    <input type="date" name="start_date" value="{{ start_date }}">
+            </section>
 
-    <span class="date-sep">~</span>
 
-    <input type="date" name="end_date" value="{{ end_date }}">
 
-    <button type="submit">조회</button>
+            <!-- ======================= -->
+            <!-- 일 매출 + 그래프 -->
+            <!-- ======================= -->
 
-</form>
+            <div class="sales-grid">
 
-<div class="table-scroll">
+                <div class="panel">
 
-<table class="sales-table">
+                    <h2>일 매출</h2>
 
-<thead>
-<tr>
-<th>날짜</th>
-<th>매출</th>
-</tr>
-</thead>
+                    <form method="get" class="sales-inline-form">
 
-<tbody>
+                        <input type="date" name="start_date" value="{{ start_date }}">
 
-{% for d in daily_sales %}
-<tr>
-<td>{{ d.d }}</td>
-<td>{{ "{:,}".format(d.sales) }}원</td>
-</tr>
-{% endfor %}
+                        <span class="date-sep">~</span>
 
-</tbody>
+                        <input type="date" name="end_date" value="{{ end_date }}">
 
-</table>
+                        <button type="submit">조회</button>
 
-</div>
+                    </form>
 
-<div class="table-footer">
+                    <div class="table-scroll">
 
-<a class="download-btn"
-href="{{ url_for('export_sales_csv',
+                        <table class="sales-table">
+
+                            <thead>
+                                <tr>
+                                    <th>날짜</th>
+                                    <th>매출</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for d in daily_sales %}
+                                <tr>
+                                    <td>{{ d.d }}</td>
+                                    <td>{{ "{:,}".format(d.sales) }}원</td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="table-footer">
+
+                        <a class="download-btn" href="{{ url_for('export_sales_csv',
 start_date=start_date,
 end_date=end_date) }}">
 
-CSV 다운로드
+                            CSV 다운로드
 
-</a>
+                        </a>
 
-</div>
+                    </div>
 
-</div>
-
-
-
-<div class="chart-box">
-
-<canvas id="dailyChart"></canvas>
-
-</div>
-
-</div>
+                </div>
 
 
 
-<!-- ======================= -->
-<!-- 월 매출 + 그래프 -->
-<!-- ======================= -->
+                <div class="chart-box">
 
-<div class="sales-grid">
+                    <canvas id="dailyChart"></canvas>
 
-<div class="panel">
+                </div>
 
-<div class="panel-header">
-
-<h2>월 매출</h2>
-
-<form method="get">
-
-<input type="hidden" name="start_date" value="{{ start_date }}">
-<input type="hidden" name="end_date" value="{{ end_date }}">
-
-<select name="year" onchange="this.form.submit()">
-
-{% for y in year_list %}
-<option value="{{ y }}" {% if y|string == year|string %}selected{% endif %}>
-{{ y }}년
-</option>
-{% endfor %}
-
-</select>
-
-</form>
-
-</div>
+            </div>
 
 
-<div class="table-scroll">
 
-<table class="sales-table">
+            <!-- ======================= -->
+            <!-- 월 매출 + 그래프 -->
+            <!-- ======================= -->
 
-<thead>
-<tr>
-<th>월</th>
-<th>매출</th>
-</tr>
-</thead>
+            <div class="sales-grid">
 
-<tbody>
+                <div class="panel">
 
-{% for m in monthly_sales %}
-<tr>
-<td>{{ m.m }}</td>
-<td>{{ "{:,}".format(m.sales) }}원</td>
-</tr>
-{% endfor %}
+                    <div class="panel-header">
 
-</tbody>
+                        <h2>월 매출</h2>
 
-</table>
+                        <form method="get">
 
-</div>
+                            <input type="hidden" name="start_date" value="{{ start_date }}">
+                            <input type="hidden" name="end_date" value="{{ end_date }}">
+
+                            <select name="year" onchange="this.form.submit()">
+
+                                {% for y in year_list %}
+                                <option value="{{ y }}" {% if y|string==year|string %}selected{% endif %}>
+                                    {{ y }}년
+                                </option>
+                                {% endfor %}
+
+                            </select>
+
+                        </form>
+
+                    </div>
 
 
-<div class="table-footer">
+                    <div class="table-scroll">
 
-<a class="download-btn"
-href="{{ url_for('export_month_sales_csv',
+                        <table class="sales-table">
+
+                            <thead>
+                                <tr>
+                                    <th>월</th>
+                                    <th>매출</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for m in monthly_sales %}
+                                <tr>
+                                    <td>{{ m.m }}</td>
+                                    <td>{{ "{:,}".format(m.sales) }}원</td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="table-footer">
+
+                        <a class="download-btn" href="{{ url_for('export_month_sales_csv',
 year=year) }}">
 
-CSV 다운로드
+                            CSV 다운로드
 
-</a>
+                        </a>
 
-</div>
+                    </div>
 
-</div>
-
-
-<div class="chart-box">
-
-<canvas id="monthlyChart"></canvas>
-
-</div>
-
-</div>
+                </div>
 
 
+                <div class="chart-box">
 
-<!-- ======================= -->
-<!-- 연 매출 + 그래프 -->
-<!-- ======================= -->
+                    <canvas id="monthlyChart"></canvas>
 
-<div class="sales-grid">
-<div class="panel">
-<div class="panel-header">
-<h2>연 매출</h2>
-</div>
+                </div>
+
+            </div>
 
 
-<div class="table-scroll">
 
-<table class="sales-table">
+            <!-- ======================= -->
+            <!-- 연 매출 + 그래프 -->
+            <!-- ======================= -->
 
-<thead>
-<tr>
-<th>연도</th>
-<th>매출</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for y in yearly_sales %}
-<tr>
-<td>{{ y.y }}</td>
-<td>{{ "{:,}".format(y.sales) }}원</td>
-</tr>
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
+            <div class="sales-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>연 매출</h2>
+                    </div>
 
 
-<div class="table-footer">
+                    <div class="table-scroll">
 
-<a class="download-btn"
-href="{{ url_for('export_year_sales_csv',
+                        <table class="sales-table">
+
+                            <thead>
+                                <tr>
+                                    <th>연도</th>
+                                    <th>매출</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for y in yearly_sales %}
+                                <tr>
+                                    <td>{{ y.y }}</td>
+                                    <td>{{ "{:,}".format(y.sales) }}원</td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="table-footer">
+
+                        <a class="download-btn" href="{{ url_for('export_year_sales_csv',
 ) }}">
 
-CSV 다운로드
+                            CSV 다운로드
 
-</a>
+                        </a>
 
-</div>
+                    </div>
 
-</div>
-
-
-<div class="chart-box">
-
-<canvas id="yearlyChart"></canvas>
-
-</div>
-
-</div>
+                </div>
 
 
+                <div class="chart-box">
 
-</main>
+                    <canvas id="yearlyChart"></canvas>
 
-</div>
+                </div>
+
+            </div>
 
 
 
-<script>
+        </main>
 
-const dailyLabels = {{ daily_labels | safe }};
-const dailyValues = {{ daily_values | safe }};
-
-const monthlyLabels = {{ monthly_labels | safe }};
-const monthlyValues = {{ monthly_values | safe }};
-
-const yearlyLabels = {{ yearly_labels | safe }};
-const yearlyValues = {{ yearly_values | safe }};
+    </div>
 
 
 
-new Chart(document.getElementById("dailyChart"),{
+    <script>
 
-type:"line",
+        const dailyLabels = {{ daily_labels | safe }};
+        const dailyValues = {{ daily_values | safe }};
 
-data:{
-labels:dailyLabels,
-datasets:[{
-data:dailyValues,
-borderColor:"#2f6bff",
-backgroundColor:"rgba(47,107,255,0.1)",
-fill:true,
-tension:0.4
-}]
-},
+        const monthlyLabels = {{ monthly_labels | safe }};
+        const monthlyValues = {{ monthly_values | safe }};
 
-options:{plugins:{legend:{display:false}}}
-
-});
+        const yearlyLabels = {{ yearly_labels | safe }};
+        const yearlyValues = {{ yearly_values | safe }};
 
 
 
-new Chart(document.getElementById("monthlyChart"),{
+        new Chart(document.getElementById("dailyChart"), {
 
-type:"bar",
+            type: "line",
 
-data:{
-labels:monthlyLabels,
-datasets:[{
-data:monthlyValues,
-backgroundColor:"#2f6bff"
-}]
-},
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    data: dailyValues,
+                    borderColor: "#800020",
+                    backgroundColor: "rgba(128,0,32,0.15)",
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
 
-options:{plugins:{legend:{display:false}}}
+            options: { plugins: { legend: { display: false } } }
 
-});
+        });
 
 
 
-new Chart(document.getElementById("yearlyChart"),{
+        new Chart(document.getElementById("monthlyChart"), {
 
-type:"bar",
+            type: "bar",
 
-data:{
-labels:yearlyLabels,
-datasets:[{
-data:yearlyValues,
-backgroundColor:"#4CAF50"
-}]
-},
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    data: monthlyValues,
+                    backgroundColor: "rgba(128,0,32,0.85)"
+                }]
+            },
 
-options:{plugins:{legend:{display:false}}}
+            options: { plugins: { legend: { display: false } } }
 
-});
+        });
 
-</script>
+
+
+        new Chart(document.getElementById("yearlyChart"), {
+
+            type: "bar",
+
+            data: {
+                labels: yearlyLabels,
+                datasets: [{
+                    data: yearlyValues,
+                    backgroundColor: "#6b7280"
+                }]
+            },
+
+            options: { plugins: { legend: { display: false } } }
+
+        });
+
+    </script>
 
 </body>
+
 </html>

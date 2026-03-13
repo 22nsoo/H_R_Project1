@@ -5,22 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>문의</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cs_list.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cs_form.css') }}">
 </head>
 
 <body>
     <div class="top-bar">
         <div class="top-bar-left">
             <a href="/main">H&R</a>
-            <span>BEST</span>
-            <span>SALE</span>
+
         </div>
         <div class="top-bar-right">
             <a href="{{ url_for('cart_page') }}">장바구니
                 {% if session.get('cart') %}<span
-                    style="background: #fff; color: #800020; font-size: 10px; padding: 1px 5px; border-radius: 10px; margin-left: 3px;">{{ session.get('cart').values() | map(attribute='qty') | sum }}</span>{% endif %}
+                    style="background: #fff; color: #800020; font-size: 10px; padding: 1px 5px; border-radius: 10px; margin-left: 3px;">{{
+                    session.get('cart').values() | map(attribute='qty') | sum }}</span>{% endif %}
             </a>
-            <a href="http://localhost:5001" target="_blank" style="color: rgba(255,255,255,0.7); font-size: 12px;">관리자</a>
+            <a href="http://localhost:5001" target="_blank"
+                style="color: rgba(255,255,255,0.7); font-size: 12px;">관리자</a>
             {% if session.get('user_name') %}
             <a href="{{ url_for('mypage') }}">마이페이지</a>
             <span style="color: rgba(255,255,255,0.9);"><b>{{ session.get('user_name') }}님</b></span>
@@ -44,8 +45,10 @@
                 <thead>
                     <tr style="background: #fcfcfc; border-bottom: 1px solid #eee;">
                         <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">구분</th>
-                        <th style="padding: 15px; text-align: left; font-size: 13px; color: #666; font-weight: 600;">문의 내용</th>
-                        <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">작성일</th>
+                        <th style="padding: 15px; text-align: left; font-size: 13px; color: #666; font-weight: 600;">문의
+                            내용</th>
+                        <th style="padding: 15px; width: 120px; font-size: 13px; color: #666; font-weight: 600;">작성일
+                        </th>
                         <th style="padding: 15px; width: 100px; font-size: 13px; color: #666; font-weight: 600;">상태</th>
                     </tr>
                 </thead>
@@ -74,8 +77,10 @@
 
                         <td style="padding: 20px;">
                             <a href="/cs/detail/{{ item.cs_id }}" style="text-decoration: none; display: block;">
-                                <div style="font-size: 12px; color: #999; margin-bottom: 4px; font-weight: 500;">{{ item.product_name }}</div>
-                                <div style="font-size: 15px; font-weight: 600; color: #333; line-height: 1.4;">{{ item.cs_title }}</div>
+                                <div style="font-size: 12px; color: #999; margin-bottom: 4px; font-weight: 500;">{{
+                                    item.product_name }}</div>
+                                <div style="font-size: 15px; font-weight: 600; color: #333; line-height: 1.4;">{{
+                                    item.cs_title }}</div>
                             </a>
                         </td>
 

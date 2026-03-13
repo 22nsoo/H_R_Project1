@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="dashboard-page">
     <div class="layout">
         <aside class="sidebar">
@@ -34,39 +36,39 @@
             </header>
 
             {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div class="flash-box">
-                        {% for message in messages %}
-                            <div class="flash-message">{{ message }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+            {% if messages %}
+            <div class="flash-box">
+                {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% endwith %}
 
             <section class="card-grid">
                 <a href="{{ url_for('seller_sales') }}">
-                <div class="stat-card">
-                    <div class="stat-title">일매출</div>
-                    <div class="stat-value">{{ "{:,}".format(today_sales) }}원</div>
-                </div>
+                    <div class="stat-card">
+                        <div class="stat-title">일매출</div>
+                        <div class="stat-value">{{ "{:,}".format(today_sales) }}원</div>
+                    </div>
                 </a>
                 <a href="{{ url_for('seller_sales') }}">
-                <div class="stat-card">
-                    <div class="stat-title">월매출</div>
-                    <div class="stat-value">{{ "{:,}".format(month_sales) }}원</div>
-                </div>
+                    <div class="stat-card">
+                        <div class="stat-title">월매출</div>
+                        <div class="stat-value">{{ "{:,}".format(month_sales) }}원</div>
+                    </div>
                 </a>
                 <a href="{{ url_for('seller_orders', type='pending') }}" class="stat-card-link">
-                <div class="stat-card">
-                    <div class="stat-title">배송 미처리건</div>
-                    <div class="stat-value">{{ pending_orders }}건</div>
-                </div>
+                    <div class="stat-card">
+                        <div class="stat-title">배송 미처리건</div>
+                        <div class="stat-value">{{ pending_orders }}건</div>
+                    </div>
                 </a>
                 <a href="{{ url_for('seller_cs') }}">
-                <div class="stat-card">
-                    <div class="stat-title">문의 및 교환/환불</div>
-                    <div class="stat-value">{{ cs_count }}개</div>
-                </div>
+                    <div class="stat-card">
+                        <div class="stat-title">문의 및 교환/환불</div>
+                        <div class="stat-value">{{ cs_count }}개</div>
+                    </div>
                 </a>
             </section>
 
@@ -74,8 +76,8 @@
                 <div class="chart-scroll">
                     <h2>매출 현황</h2>
                     <div class="chart-tabs">
-                    <button onclick="showDaily()">일매출</button>
-                    <button onclick="showMonthly()">월매출</button>
+                        <button onclick="showDaily()">일매출</button>
+                        <button onclick="showMonthly()">월매출</button>
                     </div>
 
                     <canvas id="salesChart"></canvas>
@@ -84,21 +86,21 @@
                 <div class="panel">
                     <h2>인기 상품 TOP 5</h2>
                     {% if top_products %}
-                        {% for item in top_products %}
-                        <div class="rank-item">
-                            <img src="{{ item['image_main1'] or 'https://via.placeholder.com/50' }}" alt="상품 이미지">
-                            <div class="product-info">
-                                <div class="product-name">{{ item["product_name"] }}</div>
-                                <div class="product-cat">{{ item["category1"] }}</div>
-                            </div>
-                            <div class="rank-sales">
-                                <div>{{ "{:,}".format(item["total_sales"]) }}원</div>
-                                <small>{{ item["total_qty"] }}개 판매</small>
-                            </div>
+                    {% for item in top_products %}
+                    <div class="rank-item">
+                        <img src="{{ item['image_main1'] or 'https://via.placeholder.com/50' }}" alt="상품 이미지">
+                        <div class="product-info">
+                            <div class="product-name">{{ item["product_name"] }}</div>
+                            <div class="product-cat">{{ item["category1"] }}</div>
                         </div>
-                        {% endfor %}
+                        <div class="rank-sales">
+                            <div>{{ "{:,}".format(item["total_sales"]) }}원</div>
+                            <small>{{ item["total_qty"] }}개 판매</small>
+                        </div>
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <p>데이터가 없습니다.</p>
+                    <p>데이터가 없습니다.</p>
                     {% endif %}
                 </div>
             </div>
@@ -124,14 +126,17 @@
                             {% for p in low_stock_products %}
                             <tr>
                                 <td>
-                                    <img src="{{ p['image_main1'] or 'https://via.placeholder.com/50' }}" 
+                                    <img src="{{ p['image_main1'] or 'https://via.placeholder.com/50' }}"
                                         style="width:50px; height:50px; object-fit:cover;">
                                 </td>
                                 <td>{{ p["product_name"] }}</td>
                                 <td><span class="badge warning">{{ p["stock"] }}개 남음</span></td>
                                 <td>
-                                    <form method="post" action="{{ url_for('update_product_stock', product_id=p['product_id']) }}" class="inline-form">
-                                        <input type="number" name="stock" min="0" value="{{ p['stock'] }}" class="small-input">
+                                    <form method="post"
+                                        action="{{ url_for('update_product_stock', product_id=p['product_id']) }}"
+                                        class="inline-form">
+                                        <input type="number" name="stock" min="0" value="{{ p['stock'] }}"
+                                            class="small-input">
                                         <button type="submit">재고수정</button>
                                     </form>
                                 </td>
@@ -140,7 +145,7 @@
                         </tbody>
                     </table>
                     {% else %}
-                        <p>재고 부족 상품이 없습니다.</p>
+                    <p>재고 부족 상품이 없습니다.</p>
                     {% endif %}
                 </div>
 
@@ -165,13 +170,20 @@
                                 <td>{{ o["order_code"] }}</td>
                                 <td>{{ o["customer_name"] }}</td>
                                 <td>
-                                    <form method="post" action="{{ url_for('update_order_status', order_id=o['order_id']) }}" class="inline-form">
+                                    <form method="post"
+                                        action="{{ url_for('update_order_status', order_id=o['order_id']) }}"
+                                        class="inline-form">
                                         <select name="order_status">
-                                            <option value="주문완료" {% if o["order_status"] == "주문완료" %}selected{% endif %}>주문완료</option>
-                                            <option value="배송준비중" {% if o["order_status"] == "배송준비중" %}selected{% endif %}>배송준비중</option>
-                                            <option value="배송중" {% if o["order_status"] == "배송중" %}selected{% endif %}>배송중</option>
-                                            <option value="배송완료" {% if o["order_status"] == "배송완료" %}selected{% endif %}>배송완료</option>
-                                            <option value="취소" {% if o["order_status"] == "취소" %}selected{% endif %}>취소</option>
+                                            <option value="주문완료" {% if o["order_status"]=="주문완료" %}selected{% endif %}>
+                                                주문완료</option>
+                                            <option value="배송준비중" {% if o["order_status"]=="배송준비중" %}selected{% endif
+                                                %}>배송준비중</option>
+                                            <option value="배송중" {% if o["order_status"]=="배송중" %}selected{% endif %}>배송중
+                                            </option>
+                                            <option value="배송완료" {% if o["order_status"]=="배송완료" %}selected{% endif %}>
+                                                배송완료</option>
+                                            <option value="취소" {% if o["order_status"]=="취소" %}selected{% endif %}>취소
+                                            </option>
                                         </select>
                                         <button type="submit">변경</button>
                                     </form>
@@ -181,7 +193,7 @@
                         </tbody>
                     </table>
                     {% else %}
-                        <p>최근 주문이 없습니다.</p>
+                    <p>최근 주문이 없습니다.</p>
                     {% endif %}
                 </div>
             </div>
@@ -189,69 +201,70 @@
     </div>
 
     <script>
-    const dailyLabels = {{ chart_labels | safe }};
-    const dailyValues = {{ chart_values | safe }};
+        const dailyLabels = {{ chart_labels | safe }};
+        const dailyValues = {{ chart_values | safe }};
 
-    const monthlyLabels = {{ monthly_labels | safe }};
-    const monthlyValues = {{ monthly_values | safe }};
+        const monthlyLabels = {{ monthly_labels | safe }};
+        const monthlyValues = {{ monthly_values | safe }};
 
-    const ctx = document.getElementById("salesChart").getContext("2d");
+        const ctx = document.getElementById("salesChart").getContext("2d");
 
-    // 기본 그래프 = 일매출
-    let salesChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: dailyLabels,
-            datasets: [{
-                data: dailyValues,
-                borderColor: "#2f6bff",
-                backgroundColor: "rgba(47, 107, 255, 0.1)",
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            interaction: {
-                mode: "index",
-                intersect: false
+        // 기본 그래프 = 일매출
+        let salesChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    data: dailyValues,
+                    borderColor: "#800020",
+                    backgroundColor: "rgba(128,0,32,0.15)",
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
             },
-            plugins: {
-                legend: {
-                    display: false
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: "index",
+                    intersect: false
                 },
-                tooltip: {
-                    enabled: true,
-                    callbacks: {
-                        label: function(context) {
-                            return context.raw.toLocaleString() + "원";
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function (context) {
+                                return context.raw.toLocaleString() + "원";
+                            }
                         }
                     }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
+        });
+
+        // 일매출 버튼
+        function showDaily() {
+            salesChart.data.labels = dailyLabels;
+            salesChart.data.datasets[0].data = dailyValues;
+            salesChart.update();
         }
-    });
 
-    // 일매출 버튼
-    function showDaily(){
-        salesChart.data.labels = dailyLabels;
-        salesChart.data.datasets[0].data = dailyValues;
-        salesChart.update();
-    }
-
-    // 월매출 버튼
-    function showMonthly(){
-        salesChart.data.labels = monthlyLabels;
-        salesChart.data.datasets[0].data = monthlyValues;
-        salesChart.update();
-    }
+        // 월매출 버튼
+        function showMonthly() {
+            salesChart.data.labels = monthlyLabels;
+            salesChart.data.datasets[0].data = monthlyValues;
+            salesChart.update();
+        }
     </script>
 </body>
+
 </html>

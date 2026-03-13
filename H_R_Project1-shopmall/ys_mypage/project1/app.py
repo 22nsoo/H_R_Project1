@@ -1847,7 +1847,7 @@ def delete_selected_products():
         return redirect(url_for("admin_login"))
 
     seller = get_current_seller()
-    product_ids = request.form.getlist("delete_ids")
+    product_ids = request.form.getlist("product_ids")
 
     if not product_ids:
         flash("삭제할 상품을 선택하세요.")

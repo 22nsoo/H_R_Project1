@@ -1,13 +1,14 @@
 :root {
-    --primary: #2f6bff;
-    --primary-dark: #1e56d8;
-    --bg-app: #ece8f8;;
+    --primary: #800020;
+    --primary-dark: #5f0018;
+    --bg-app: #faeaeafd;
+    ;
     --bg-gray: #f8f9fc;
     --bg-soft: #f8fafc;
     --border: #e9eef5;
     --text: #333;
     --muted: #718096;
-    --sidebar: #1a233a;
+    --sidebar: #800020;
     --danger: #e53e3e;
     --success: #16a34a;
     --warning: #dd6b20;
@@ -60,7 +61,7 @@ img {
 .sidebar-title {
     padding: 0 24px 20px;
     font-weight: 700;
-    border-bottom: 1px solid #2d3748;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .menu {
@@ -72,7 +73,7 @@ img {
 .menu li {
     padding: 12px 24px;
     cursor: pointer;
-    opacity: 0.72;
+    opacity: 0.95;
     transition: 0.2s;
 }
 
@@ -131,12 +132,13 @@ img {
 }
 
 .flash-message {
-    background: #ebf8ff;
-    border: 1px solid #bee3f8;
-    color: #2b6cb0;
-    padding: 12px 14px;
-    border-radius: 10px;
-    margin-bottom: 8px;
+    background: #f8f3f5;
+    border: 1px solid #ead8de;
+    color: #7a1831;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
 .panel,
@@ -773,7 +775,7 @@ tbody tr:hover td {
 .cs-btn {
     padding: 8px 12px;
     font-size: 12px;
-    background: #3b82f6;
+    background: #800020;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -799,7 +801,8 @@ tbody tr:hover td {
     margin-top: 6px;
     padding: 8px 12px;
     font-size: 12px;
-    background: #3b82f6;
+    background: #800020;
+    ;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -808,7 +811,7 @@ tbody tr:hover td {
 }
 
 .reply-btn:hover {
-    background: #2563eb;
+    background: var(--primary-dark);
 }
 
 .delete-btn {
@@ -1312,6 +1315,7 @@ tbody tr:hover td {
 }
 
 @media (max-width: 900px) {
+
     .product-form-page .form-grid.two-col,
     .product-form-page .form-grid.four-col {
         grid-template-columns: 1fr;
@@ -1364,7 +1368,7 @@ tbody tr:hover td {
 }
 
 .order-link {
-    color: #2f6bff;
+    color: #8b1e2d;
     font-weight: 700;
     text-decoration: none;
     transition: 0.2s ease;
