@@ -14,6 +14,7 @@ EMBEDDINGS_PATH = os.path.join(BASE_DIR, "embeddings.pkl")
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 MAX_IMAGE_MB = 5
 MIN_IMAGE_SIDE = 160
+MIN_SCORE = 0.22
 
 _device = "cuda" if torch.cuda.is_available() else "cpu"
 _model = None
@@ -93,10 +94,19 @@ def search_similar_images(image_path: str, top_k: int = 5) -> List[Dict[str, obj
     query_embedding = _encode_image(image_path)
     scores = embeddings @ query_embedding
 
-    ranked_indices = np.argsort(scores)[::-1][:top_k]
+    ranked_indices = np.argsort(scores)[::-1]
+
     results = []
     for idx in ranked_indices:
+        score = float(scores[idx])
+        if score < MIN_SCORE:
+            continue
+
         item = dict(items[idx])
-        item["score"] = float(scores[idx])
+        item["score"] = score
         results.append(item)
+
+        if len(results) >= top_k:
+            break
+
     return results

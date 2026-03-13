@@ -81,6 +81,22 @@
             border: 1px solid #ead6dc;
             padding: 20px 22px;
             margin-bottom: 26px;
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .product-thumb {
+            width: 96px;
+            height: 96px;
+            border: 1px solid #ead6dc;
+            background: #fff;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex: 1;
         }
 
         .product-name {
@@ -92,6 +108,7 @@
         .product-meta {
             font-size: 14px;
             color: #666;
+            line-height: 1.6;
         }
 
         .label {
@@ -184,6 +201,18 @@
             .card {
                 padding: 22px;
             }
+
+            .product-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .product-thumb {
+                width: 100%;
+                max-width: 180px;
+                height: auto;
+                aspect-ratio: 1 / 1;
+            }
         }
     </style>
 </head>
@@ -218,21 +247,31 @@
             {% endwith %}
 
             <div class="product-box">
-                <div class="product-name">{{ product.product_name }}</div>
-                <div class="product-meta">
-                    {{ product.brand }} · {{ "{:,}".format(product.price) }}원
-                    {% if product.size_options %}
-                    · 사이즈 옵션: {{ product.size_options }}
-                    {% endif %}
+                {% if product.img %}
+                <img src="{{ product.img }}" alt="{{ product.name }}" class="product-thumb">
+                {% endif %}
+
+                <div class="product-info">
+                    <div class="product-name">{{ product.name }}</div>
+                    <div class="product-meta">
+                        {{ product.brand }} · {{ "{:,}".format(product.price) }}원
+                        {% if product.size_options %}
+                        <br>사이즈 옵션: {{ product.size_options }}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
             <form method="post">
                 <div class="label">구매한 사이즈</div>
                 <select name="purchased_size" class="select" required>
-                    {% for s in product.size_options.split(',') %}
-                    <option value="{{ s.strip() }}">{{ s.strip() }}</option>
-                    {% endfor %}
+                    {% if product.size_options %}
+                        {% for s in product.size_options.split(',') %}
+                        <option value="{{ s.strip() }}">{{ s.strip() }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="FREE">FREE</option>
+                    {% endif %}
                 </select>
 
                 <div class="label">사이즈 체감</div>
@@ -260,12 +299,16 @@
                 </select>
 
                 <div class="label">리뷰 내용</div>
-                <textarea name="review_text" class="textarea"
-                    placeholder="예: 정사이즈 느낌이고 어깨가 편해요. 세미오버핏으로 입기 좋았고 전반적으로 만족합니다." required></textarea>
+                <textarea
+                    name="review_text"
+                    class="textarea"
+                    placeholder="예: 정사이즈 느낌이고 어깨가 편해요. 세미오버핏으로 입기 좋았고 전반적으로 만족합니다."
+                    required></textarea>
 
                 <div class="btn-row">
                     <button type="submit" class="btn btn-primary">리뷰 등록</button>
                     <a href="{{ url_for('product_detail', p_id=product.id) }}" class="btn btn-outline">돌아가기</a>
+                </div>
             </form>
         </div>
     </div>
