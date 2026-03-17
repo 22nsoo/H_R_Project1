@@ -54,12 +54,17 @@ def _csv_response(filename, headers, rows):
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(headers)
+
     for row in rows:
         writer.writerow(row)
 
-    response = make_response(output.getvalue())
-    response.headers["Content-Type"] = "text/csv; charset=utf-8-sig"
+    csv_data = output.getvalue()
+
+    response = make_response(csv_data.encode("utf-8-sig"))  # ⭐ 핵심 수정
+
+    response.headers["Content-Type"] = "text/csv"
     response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    writer = csv.writer(output, lineterminator="\n")
     return response
 
 
@@ -1147,6 +1152,17 @@ def order_complete():
                     item["selected_color"],
                 ))
 
+                # 재고 차감 추가
+                sql_stock = """
+                    UPDATE products
+                    SET stock = stock - %s
+                    WHERE product_id = %s
+                """
+                cursor.execute(sql_stock, (
+                    item["qty"],
+                    item["p_id"],
+                ))
+
             conn.commit()
 
         if not p_id:
@@ -1517,7 +1533,7 @@ def export_sales_csv():
                 SELECT DATE(order_date) AS d, COALESCE(SUM(total_amount), 0) AS sales
                 FROM orders
                 WHERE seller_id = %s
-                  AND DATE(order_date) BETWEEN %s AND %s
+                AND DATE(order_date) BETWEEN %s AND %s
                 GROUP BY DATE(order_date)
                 ORDER BY d ASC
             """, (seller["seller_id"], start_date, end_date))
