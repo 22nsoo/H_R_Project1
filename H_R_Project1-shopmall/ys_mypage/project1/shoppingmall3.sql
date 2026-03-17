@@ -509,3 +509,30 @@ INSERT INTO users (username, password, gender, height, weight, preferred_fit, us
 ('minseok', '1234', '남', 173, 69, '세미오버핏', 'M');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+INSERT INTO customer_service
+(order_id, product_id, seller_id, customer_name, cs_type, cs_title, cs_content, cs_status)
+VALUES
+(1, 1, 1, '김민수', '상품문의', '사이즈 문의', 'M 사이즈 재입고 언제 되나요?', '접수'),
+
+(2, 2, 1, '박지은', '상품문의', '배송 문의', '오늘 주문하면 언제 배송되나요?', '접수'),
+
+(4, 6, 1, '이도윤', '상품문의', '재질 문의', '이 제품 면인가요?', '처리중');
+
+
+
+INSERT INTO customer_service
+(order_id, product_id, seller_id, customer_name, cs_type, cs_title, cs_content, cs_status)
+VALUES
+(3, 4, 1, '최수진', '교환요청', '사이즈 교환', '260 → 265로 교환 요청합니다.', '접수'),
+
+(9, 17, 1, '강도현', '교환요청', '상품 교환 요청', '색상이 달라서 교환 원합니다.', '처리중');
+
+
+INSERT INTO customer_service
+(order_id, product_id, seller_id, customer_name, cs_type, cs_title, cs_content, cs_status)
+VALUES
+(3, 4, 1, '최수진', '반품요청', '제품 불량', '신발 밑창이 떨어져 있습니다.', '접수'),
+
+(11, 22, 1, '오세은', '반품요청', '단순 변심', '생각보다 커서 반품하려 합니다.', '접수');
